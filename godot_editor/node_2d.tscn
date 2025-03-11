@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmbbovs8vnafl"]
+
+[ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://char22.png" id="1_wtcfe"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0e48y"]
+radius = 4.0
+
+[node name="Node2D" type="ARPG"]
+
+[node name="Player" type="Player" parent="."]
+acceleration = 0.14
+friction = 0.16
+position = Vector2(129, 79)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_0e48y")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+position = Vector2(0, -12)
+texture = ExtResource("1_wtcfe")
+hframes = 2
+vframes = 24
+frame = 1

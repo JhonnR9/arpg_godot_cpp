@@ -1,0 +1,35 @@
+# Godot import and export directories
+.import/
+.export/
+**/*.godot/tmp/
+**/*.godot/imported/
+**/*.godot/editor_settings-*
+
+# Build files
+build/
+*.obj
+*.o
+*.a
+*.lib
+*.exp
+*.dll
+*.so
+*.dylib
+*.exe
+*.pdb
+
+# Compiled scripts
+*.gdc
+
+# Godot GDExtension specific
+bin/
+*.gen.cpp
+*.gen.h
+
+# Godot C++ bindings repository
+*.cache/
+
+# Ignore Git, SCons, and VSCode files
+.sconsign.dblite
+.vscode/
+compile_commands.json
