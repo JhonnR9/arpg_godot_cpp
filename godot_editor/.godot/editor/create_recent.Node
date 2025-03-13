@@ -1,0 +1,11 @@
+NPC
+Player
+ARPG
+AnimationPlayer
+UI
+Panel
+Label
+Control
+CanvasLayer
+CollisionShape2D
+Area2D

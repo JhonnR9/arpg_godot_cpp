@@ -3,6 +3,7 @@
 #define CHARACTER_H
 
 #include "godot_cpp/classes/character_body2d.hpp"
+#include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include <cmath>
 
@@ -11,17 +12,20 @@ using namespace godot;
 class Character : public CharacterBody2D {
 	GDCLASS(Character, CharacterBody2D);
 	
-	float_t life {100.0f};
-	float_t max_life {100.0f};
-	float_t max_move_speed {50.0f};
-	float_t acceleration {.2f};
-	float_t friction {.2f};
+	String display_name;
+	float_t life;
+	float_t max_life;
+	float_t max_move_speed;
+	float_t acceleration;
+	float_t friction;
 	
 protected:
 	static void _bind_methods();
 
 public:
 	Character();
+
+	virtual void _ready()override;
 
 	void move(Vector2 p_direction);
 	void apply_friction();
@@ -30,6 +34,9 @@ public:
 
 	float_t get_life();
 	void set_life(float_t p_life);
+
+	String get_display_name();
+	void set_display_name(String p_display_name);
 
 	float_t get_move_speed();
 	void set_move_speed(float_t p_move_speed);

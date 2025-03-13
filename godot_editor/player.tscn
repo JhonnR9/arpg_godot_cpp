@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvpggfmiqjkus"]
+
+[ext_resource type="JSON" path="res://data/test.json" id="1_4flbx"]
+
+[node name="Player" type="NPC"]
+resource = ExtResource("1_4flbx")
+life = 0.34
+acceleration = 1.0
+friction = 1.0
+max_move_speed = 0.415
+display_name = 0.865

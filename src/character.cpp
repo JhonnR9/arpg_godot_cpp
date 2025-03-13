@@ -10,7 +10,15 @@
 #include "godot_cpp/variant/vector3.hpp"
 #include <cmath>
 
+void Character::_ready(){
+    life = 100.0f;
+    max_life = 100.0f;
+    max_move_speed = 100.0f;
+    acceleration = 0.2f;
+    friction = 0.2f;
+    display_name = "No name";
 
+}
 
 
 void Character::_bind_methods() {
@@ -30,10 +38,15 @@ void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_max_move_speed"), &Character::get_max_move_speed);
     ClassDB::bind_method(D_METHOD("set_max_move_speed",  "p_max_move_speed"), &Character::set_max_move_speed);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed", "get_max_move_speed");
+
+    ClassDB::bind_method(D_METHOD("get_display_name"), &Character::get_display_name);
+    ClassDB::bind_method(D_METHOD("set_display_name",  "p_display_name"), &Character::set_display_name);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "display_name"), "set_display_name", "get_display_name");
     
 }
 Character::Character() {
     set_physics_process(true);
+    
 }
 
 void Character::move(Vector2 p_direction) {
@@ -60,7 +73,7 @@ void Character::apply_friction(){
 
 
 void Character::_physics_process(double_t p_delta){
-    move_and_slide();
+   // move_and_slide();
 }
 
 float_t Character::get_life(){
@@ -93,4 +106,12 @@ float_t Character::get_friction(){
 
 void Character::set_friction(float_t p_friction){
     friction = p_friction;
+}
+
+String Character::get_display_name(){
+    return display_name;
+}
+
+void Character::set_display_name(String p_display_name){
+    display_name = p_display_name;
 }
