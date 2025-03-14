@@ -4,9 +4,9 @@
 #include "godot_cpp/classes/input.hpp"
 #include "godot_cpp/classes/scene_tree.hpp"
 #include "godot_cpp/variant/callable.hpp"
-#include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
-#include "player.h"
+#include "characters/player/player.h"
+
 
 NPC::NPC() {
     
@@ -24,6 +24,7 @@ void NPC::_bind_methods() {
 }
 
 void NPC::_ready() {
+    can_talk = false;
     Character::_ready();
     area2d = get_node<Area2D>("Area2D");
     area2d->connect("body_entered", Callable(this, "_on_area_2d_body_entered"));
@@ -46,13 +47,23 @@ void NPC::load_data(const Dictionary& p_data) {
     }
 }
 
-void NPC::_on_area_2d_body_entered(Node2D* body) {
+void NPC::_process(double_t delta){
 
-    if ( Player* player = Object::cast_to<Player>(body)) {
+    if (can_talk && Input::get_singleton()->is_action_just_pressed("iteract")){
         if (ARPG* arpg = Object::cast_to<ARPG>(get_tree()->get_current_scene())){
             arpg->emit_signal("show_dialog", vformat("%s:  --ola amigo voce e um amigo!!!", get_display_name()));
-
         }
+        
+    }
+    
+   
+   
+}
+
+void NPC::_on_area_2d_body_entered(Node2D* body) {
+    if ( Player* player = Object::cast_to<Player>(body)) {
+        can_talk = true;
+       
     }
 
 }
@@ -60,6 +71,7 @@ void NPC::_on_area_2d_body_entered(Node2D* body) {
 void NPC::_on_area_2d_body_exited(Node2D* body) {
 
     if ( Player* player = Object::cast_to<Player>(body)) {
+        can_talk = false;
         if (ARPG* arpg = Object::cast_to<ARPG>(get_tree()->get_current_scene())){
             arpg->emit_signal("hide_dialog");
         }

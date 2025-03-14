@@ -15,6 +15,7 @@ private:
     uint16_t age;
     Ref<Resource> resource;
     Area2D* area2d;
+    bool can_talk;
 
 protected:
     static void _bind_methods();
@@ -22,6 +23,7 @@ protected:
 public:
     NPC();
     virtual void _ready() override;
+    virtual void _process(double_t delta) override;
     void load_data(const Dictionary& p_data);
 
     Ref<Resource> get_resource() const;

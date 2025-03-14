@@ -1,10 +1,10 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1741871123
+::res://::1741951495
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1741703960::1741736682::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1741696887::1741736682::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-node_2d.tscn::PackedScene::3230838035535760141::1741871062::0::1::::<><><>0<>0<><>::uid://tlssw48lru1w::::res://char22.png<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf
-player.tscn::PackedScene::8664568732048542506::1741871062::0::1::::<><><>0<>0<><>::
-::res://bin/::1741871120
+node_2d.tscn::PackedScene::3230838035535760141::1741890768::0::1::::<><><>0<>0<><>::uid://tlssw48lru1w::::res://char22.png<>res://data/test.json<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf
+player.tscn::PackedScene::8664568732048542506::1741890768::0::1::::<><><>0<>0<><>::res://data/test.json
+::res://bin/::1741951491
 arpg.gdextension::GDExtension/GDExtension::4811481445974584174::1741696824::0::1::::<><><>0<>0<><>::
 ::res://data/::1741866779
 test.json::JSON/JSON::-1::1741866779::0::1::::<><><>0<>0<><>::
