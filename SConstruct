@@ -2,22 +2,27 @@
 import os
 import sys
 
+# Importa o ambiente do godot-cpp
 env = SConscript("godot-cpp/SConstruct")
 
-# For reference:
-# - CCFLAGS are compilation flags shared between C and C++
-# - CFLAGS are for C-specific compilation flags
-# - CXXFLAGS are for C++-specific compilation flags
-# - CPPFLAGS are for pre-processor flags
-# - CPPDEFINES are for pre-processor defines
-# - LINKFLAGS are for linking flags
+# Adiciona múltiplos diretórios ao caminho de inclusão
+env.Append(CPPPATH=[
+    "src/",
+    "src/core/",
+    "src/characters/",
+    "src/characters/player/",
+    "src/ui/",
+    "src/tools/"
+])
 
-
-
-env.Append(CPPPATH=["src/**"])
-env.Append(CPPPATH=["src/"])
-
-sources = Glob("src/**/*.cpp")
+# Coleta os arquivos-fonte usando Glob para melhor precisão
+sources = []
+sources.extend(Glob("src/*.cpp"))
+sources.extend(Glob("src/core/*.cpp"))
+sources.extend(Glob("src/characters/*.cpp"))
+sources.extend(Glob("src/characters/player/*.cpp"))
+sources.extend(Glob("src/ui/*.cpp"))
+sources.extend(Glob("src/tools/*.cpp"))
 
 
 if env["platform"] == "macos":
@@ -30,18 +35,25 @@ if env["platform"] == "macos":
 elif env["platform"] == "ios":
     if env["ios_simulator"]:
         library = env.StaticLibrary(
-            "godot_editor/bin/libgdarpg.{}.{}.simulator.a".format(env["platform"], env["target"]),
+            "godot_editor/bin/libgdarpg.{}.{}.simulator.a".format(
+                env["platform"], env["target"]
+            ),
             source=sources,
         )
     else:
         library = env.StaticLibrary(
-            "godot_editor/bin/libgdarpg.{}.{}.a".format(env["platform"], env["target"]),
+            "godot_editor/bin/libgdarpg.{}.{}.a".format(
+                env["platform"], env["target"]
+            ),
             source=sources,
         )
 else:
     library = env.SharedLibrary(
-        "godot_editor/bin/libgdarpg{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+        "godot_editor/bin/libgdarpg{}{}".format(
+            env["suffix"], env["SHLIBSUFFIX"]
+        ),
         source=sources,
     )
 
+# Define o target padrão
 Default(library)

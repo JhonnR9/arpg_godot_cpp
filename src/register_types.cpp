@@ -1,11 +1,11 @@
 #include "register_types.h"
 #include <godot_cpp/core/class_db.hpp>
 #include "arpg.h"
-#include "character.h"
-#include "player.h"
-#include "json_parse.h"
-#include "npc.h"
-#include "UI.h"
+#include "characters/character.h"
+#include "characters/player/player.h"
+#include "tools/json_parse.h"
+#include "characters/npc.h"
+#include "ui/ui.h"
 
 void initialize_arpg_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {

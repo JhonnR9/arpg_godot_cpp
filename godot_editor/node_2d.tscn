@@ -1,8 +1,7 @@
-[gd_scene load_steps=15 format=3 uid="uid://bmbbovs8vnafl"]
+[gd_scene load_steps=12 format=3 uid="uid://bmbbovs8vnafl"]
 
 [ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://char22.png" id="1_wtcfe"]
 [ext_resource type="JSON" path="res://data/test.json" id="2_epypp"]
-[ext_resource type="FontFile" uid="uid://dxunq0i3381v8" path="res://data/fonts/dogicapixel.ttf" id="3_epypp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0e48y"]
 radius = 4.0
@@ -106,26 +105,6 @@ _data = {
 &"idle_down": SubResource("Animation_q6r6c")
 }
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0e48y"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-expand_margin_left = 4.0
-expand_margin_top = 4.0
-expand_margin_right = 4.0
-expand_margin_bottom = 4.0
-
-[sub_resource type="LabelSettings" id="LabelSettings_0e48y"]
-line_spacing = 1.0
-font = ExtResource("3_epypp")
-font_size = 5
-
 [node name="ARPG" type="ARPG"]
 y_sort_enabled = true
 
@@ -176,30 +155,3 @@ libraries = {
 autoplay = "idle_down"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="Dialog" type="UI" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="CanvasLayer/Dialog"]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 15.0
-offset_top = -24.0
-offset_right = 69.0
-offset_bottom = -17.0
-grow_vertical = 0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_0e48y")
-
-[node name="Label" type="Label" parent="CanvasLayer/Dialog/Panel"]
-layout_mode = 2
-text = "Text Exemple!"
-label_settings = SubResource("LabelSettings_0e48y")
-justification_flags = 171

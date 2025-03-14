@@ -4,7 +4,9 @@
 #include <godot_cpp/classes/input.hpp>
 
 
-void Player::_bind_methods() {}
+void Player::_bind_methods() {
+    
+}
 
 Player::Player() {
   set_physics_process(true);
@@ -29,6 +31,7 @@ void Player::_physics_process(double_t delta) {
               set_velocity(velocity);
           }
       }
+
   }
 }
 

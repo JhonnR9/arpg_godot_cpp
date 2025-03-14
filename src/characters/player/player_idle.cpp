@@ -16,6 +16,11 @@ void PlayerIdle::_on_state_exit(Player *p_powner)
     
 }
 
+void PlayerIdle::_bind_methods()
+{
+
+}
+
 PlayerIdle::PlayerIdle()
 {
     
