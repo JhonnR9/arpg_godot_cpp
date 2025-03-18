@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://delddmynucgt8"
+path="res://.godot/imported/dd.aseprite-eaeb6b7882521d9307193cb7ec152f89.res"
+
+[deps]
+
+source_file="res://addons/AsepriteWizard/aseprite/dd.aseprite"
+dest_files=["res://.godot/imported/dd.aseprite-eaeb6b7882521d9307193cb7ec152f89.res"]
+
+[params]
+

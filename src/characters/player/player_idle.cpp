@@ -1,27 +1,15 @@
 #include "player_idle.h"
+#include "godot_cpp/variant/utility_functions.hpp"
 
-
-void PlayerIdle::_on_state_enter(Player *p_powner)
-{
-    
+void PlayerIdle::on_state_run(double_t p_delta) {
+  //UtilityFunctions::print("update");
 }
 
-void PlayerIdle::_on_state_run(Player *p_powner, double_t p_delta)
-{
-    
-}
+void PlayerIdle::on_state_exit() {}
 
-void PlayerIdle::_on_state_exit(Player *p_powner)
-{
-    
-}
+void PlayerIdle::_bind_methods() {}
 
-void PlayerIdle::_bind_methods()
-{
-
-}
-
-PlayerIdle::PlayerIdle()
-{
-    
+void PlayerIdle::on_state_enter(Character *p_owner) {
+  this->owner = p_owner;
+  //UtilityFunctions::print("enter");
 }

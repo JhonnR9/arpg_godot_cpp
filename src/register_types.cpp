@@ -3,6 +3,10 @@
 #include "arpg.h"
 #include "characters/character.h"
 #include "characters/player/player.h"
+#include "characters/player/player_idle.h"
+#include "characters/player/player_run.h"
+#include "core/state.h"
+#include "core/state_machine.h"
 #include "tools/json_parse.h"
 #include "characters/npc.h"
 #include "ui/ui.h"
@@ -18,6 +22,10 @@ void initialize_arpg_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(JsonParse);
 	GDREGISTER_RUNTIME_CLASS(NPC);
 	GDREGISTER_RUNTIME_CLASS(UI);
+	GDREGISTER_RUNTIME_CLASS(StateMachine);
+	GDREGISTER_RUNTIME_CLASS(State);
+	GDREGISTER_RUNTIME_CLASS(PlayerIdle);
+	GDREGISTER_RUNTIME_CLASS(PlayerRun);
 
 }
 

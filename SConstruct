@@ -8,11 +8,6 @@ env = SConscript("godot-cpp/SConstruct")
 # Adiciona múltiplos diretórios ao caminho de inclusão
 env.Append(CPPPATH=[
     "src/",
-    "src/core/",
-    "src/characters/",
-    "src/characters/player/",
-    "src/ui/",
-    "src/tools/"
 ])
 
 # Coleta os arquivos-fonte usando Glob para melhor precisão
@@ -55,5 +50,4 @@ else:
         source=sources,
     )
 
-# Define o target padrão
 Default(library)

@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 100
+AlignConsecutiveAssignments: false
+AllowShortIfStatementsOnASingleLine: false
+AlignConsecutiveDeclarations: false
+
+BraceWrapping:
+  AfterFunction: true  
+  AfterClass: true      
+  AfterStruct: true     
+  AfterNamespace: true 
+  AfterControlStatement: true 

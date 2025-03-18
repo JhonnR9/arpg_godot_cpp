@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://bmbbovs8vnafl"]
+[gd_scene load_steps=16 format=3 uid="uid://bmbbovs8vnafl"]
 
 [ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://char22.png" id="1_wtcfe"]
 [ext_resource type="JSON" path="res://data/test.json" id="2_epypp"]
+[ext_resource type="FontFile" uid="uid://bqbp3jvhqtrdd" path="res://data/fonts/dogica.ttf" id="3_epypp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0e48y"]
 radius = 4.0
@@ -21,11 +22,10 @@ tracks/0/keys = {
 "values": [1]
 }
 
-[sub_resource type="Animation" id="Animation_d21ai"]
+[sub_resource type="Animation" id="Animation_epypp"]
 resource_name = "idle_down"
-length = 0.6
+length = 0.797
 loop_mode = 1
-step = 0.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -33,17 +33,16 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.302585),
+"times": PackedFloat32Array(0, 0.4),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [33, 35]
 }
 
-[sub_resource type="Animation" id="Animation_epypp"]
-resource_name = "walk_down"
-length = 0.6
+[sub_resource type="Animation" id="Animation_rj586"]
+resource_name = "idle_left"
+length = 0.797
 loop_mode = 1
-step = 0.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -51,28 +50,60 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.161057, 0.340558, 0.50053),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [1, 3, 5, 7]
+"values": [41, 41]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_q6r6c"]
+[sub_resource type="Animation" id="Animation_4d7sh"]
+resource_name = "idle_right"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.566667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [47, 45]
+}
+
+[sub_resource type="Animation" id="Animation_d21ai"]
+resource_name = "idle_up"
+length = 0.797
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [37, 39]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rj586"]
 _data = {
 &"RESET": SubResource("Animation_0hol4"),
-&"idle_down": SubResource("Animation_d21ai"),
-&"walk_down": SubResource("Animation_epypp")
+&"idle_down": SubResource("Animation_epypp"),
+&"idle_left": SubResource("Animation_rj586"),
+&"idle_right": SubResource("Animation_4d7sh"),
+&"idle_up": SubResource("Animation_d21ai")
 }
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_epypp"]
-radius = 15.1327
 
 [sub_resource type="Animation" id="Animation_kdubu"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Area2D/Sprite2D:frame")
+tracks/0/path = NodePath("Area2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -89,7 +120,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Area2D/Sprite2D:frame")
+tracks/0/path = NodePath("Area2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -104,6 +135,13 @@ _data = {
 &"RESET": SubResource("Animation_kdubu"),
 &"idle_down": SubResource("Animation_q6r6c")
 }
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_epypp"]
+radius = 15.1327
+
+[sub_resource type="LabelSettings" id="LabelSettings_0hol4"]
+font = ExtResource("3_epypp")
+font_size = 6
 
 [node name="ARPG" type="ARPG"]
 y_sort_enabled = true
@@ -124,7 +162,7 @@ frame = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
 libraries = {
-&"": SubResource("AnimationLibrary_q6r6c")
+&"": SubResource("AnimationLibrary_rj586")
 }
 autoplay = "idle_down"
 
@@ -135,23 +173,45 @@ position = Vector2(199, 50)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPC"]
 shape = SubResource("CircleShape2D_0e48y")
 
-[node name="Area2D" type="Area2D" parent="NPC"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC/Area2D"]
-shape = SubResource("CircleShape2D_epypp")
-debug_color = Color(0.988235, 0, 0.298039, 0.0941176)
-
-[node name="Sprite2D" type="Sprite2D" parent="NPC/Area2D"]
-position = Vector2(0, -12)
-texture = ExtResource("1_wtcfe")
-hframes = 2
-vframes = 24
-frame = 32
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="NPC"]
 libraries = {
 &"": SubResource("AnimationLibrary_d21ai")
 }
 autoplay = "idle_down"
 
+[node name="Area2D" type="Area2D" parent="NPC"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC/Area2D"]
+shape = SubResource("CircleShape2D_epypp")
+debug_color = Color(0.988235, 0, 0.298039, 0.0941176)
+
+[node name="Sprite" type="Sprite2D" parent="NPC/Area2D"]
+position = Vector2(0, -12)
+texture = ExtResource("1_wtcfe")
+hframes = 2
+vframes = 24
+frame = 32
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="UI" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/PanelContainer"]
+layout_mode = 2
+text = "dsfsd"
+label_settings = SubResource("LabelSettings_0hol4")

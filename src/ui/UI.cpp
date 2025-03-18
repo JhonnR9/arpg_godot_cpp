@@ -1,4 +1,4 @@
-#include "UI.h"
+#include "ui.h"
 #include "arpg.h"
 #include "godot_cpp/classes/control.hpp"
 #include "godot_cpp/classes/scene_tree.hpp"
@@ -17,7 +17,7 @@ void UI::_bind_methods(){
 
 void UI::_ready() {
     set_visible(false);
-    label = get_node<Label>("Panel/Label");
+    label = get_node<Label>("PanelContainer/Label");
     
     Node* root_tree = get_tree()->get_current_scene();
     ARPG* root = Object::cast_to<ARPG>(root_tree);

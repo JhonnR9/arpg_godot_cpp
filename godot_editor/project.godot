@@ -22,7 +22,10 @@ window/size/viewport_height=144
 window/size/window_width_override=1152
 window/size/window_height_override=648
 window/stretch/mode="canvas_items"
-window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg")
 
 [input]
 
@@ -59,5 +62,4 @@ iteract={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=3
-renderer/rendering_method="mobile"
 environment/defaults/default_clear_color=Color(0.174347, 0.339466, 0.264546, 1)

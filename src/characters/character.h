@@ -2,12 +2,16 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/character_body2d.hpp"
+#include "godot_cpp/variant/node_path.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include <cmath>
 
 using namespace godot;
+
+
 
 class Character : public CharacterBody2D {
 	GDCLASS(Character, CharacterBody2D);
@@ -18,6 +22,15 @@ class Character : public CharacterBody2D {
 	float_t max_move_speed;
 	float_t acceleration;
 	float_t friction;
+
+	//nodes
+	AnimationPlayer* animation_player;
+
+	enum LookDirection{
+		UP, DOWN, LEFT, RIGHT
+	};
+
+	LookDirection look_direction;
 	
 protected:
 	static void _bind_methods();
@@ -29,6 +42,8 @@ public:
 
 	void move(Vector2 p_direction);
 	void apply_friction();
+	void update_look_direction();
+	String get_look_direction();
 
 	virtual void _physics_process(double_t p_delta) override;
 

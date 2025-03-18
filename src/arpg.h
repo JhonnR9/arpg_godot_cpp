@@ -13,7 +13,7 @@ protected:
 
 public:
     ARPG();
-    virtual void _ready() override;
+
 };
 
 #endif // ARPG_H

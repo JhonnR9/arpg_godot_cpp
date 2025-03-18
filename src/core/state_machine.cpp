@@ -1,39 +1,63 @@
 #include "state_machine.h"
+#include "godot_cpp/classes/object.hpp"
+#include "godot_cpp/variant/utility_functions.hpp"
+#include "godot_cpp/variant/variant.hpp"
 
-template<typename K>
-void StateMacine<K>::add_state(State<K> p_new_state)
-{
-    states.append(p_new_state);
+
+void StateMachine::add_state(String name, Ref<State> p_new_state) {
+    states[name] = p_new_state;
 }
 
 
-template<typename K>
-void StateMacine<K>::set_state(State<K> p_new_state)
-{
-    current=p_new_state;
-}
+void StateMachine::set_state(String p_name) {
+    if (states.has(p_name)) {
+        current = p_name;
+        if(auto state = Object::cast_to<State>(states[p_name])){
+            state->on_state_enter(character);
+        }
 
-
-template<typename K>
-void StateMacine<K>::remove_state(State<K> p_new_state)
-{
-    if (states.has(p_new_state)) {
-        states.erase(p_new_state);
+    }else {
+        UtilityFunctions::printerr(vformat("state %s don't founded"), p_name);
     }
 }
 
 
-template<typename K>
-State<K> StateMacine<K>::get_current_state()
-{
+void StateMachine::remove_state(String p_name) {
+    if (states.has(p_name)){
+        states.erase(p_name);
+    }
+   
+}
+
+
+String StateMachine::get_current_state() {
     return current;
 }
 
+uint16_t StateMachine::get_states_count() {
+    return static_cast<uint16_t>(states.size());
+}
 
-template<typename K>
-uint16_t StateMacine<K>::get_states_count()
+void StateMachine::update(double_t p_delta)
 {
-    return states.size();
+    if (states.has(current)) { 
+        if (auto state = Object::cast_to<State>(states[current])) {
+            state->on_state_run(p_delta);
+        }
+    }
 }
 
 
+StateMachine::StateMachine(){
+    
+}
+
+void StateMachine::_bind_methods()
+{
+    
+}
+
+void StateMachine::set_character(Character* p_character)
+{
+    this->character = p_character;
+}

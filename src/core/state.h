@@ -1,22 +1,23 @@
 #ifndef __STATE_H__
 #define __STATE_H__
 
+#include "characters/character.h"
 #include "godot_cpp/classes/ref_counted.hpp"
 #include "godot_cpp/classes/wrapped.hpp"
 
 using namespace godot;
 
-template <typename K>
-class State : public RefCounted{
-    GDCLASS(State<K>, RefCounted)
+class State : public RefCounted {
+  GDCLASS(State, RefCounted)
 
-    
+protected:
+  Character *owner{nullptr};
+  static void _bind_methods();
+
 public:
-    virtual void _on_state_enter(Ref<State<K>> p_owner) = 0;
-    virtual void _on_state_run(Ref<State<K>> p_owner, double_t delta) = 0;
-    virtual void _on_state_exit(Ref<State<K>> p_owner) = 0;
-
+  virtual void on_state_enter(Character *owner);
+  virtual void on_state_run(double_t delta);
+  virtual void on_state_exit();
 };
-
 
 #endif // __STATE_H__

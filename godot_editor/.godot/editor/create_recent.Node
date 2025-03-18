@@ -1,12 +1,12 @@
+AnimationPlayer
+UI
+Label
 PanelContainer
 Container
 NPC
 Player
 ARPG
-AnimationPlayer
-UI
 Panel
-Label
 Control
 CanvasLayer
 CollisionShape2D
