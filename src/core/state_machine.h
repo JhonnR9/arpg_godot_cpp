@@ -4,6 +4,7 @@
 #include "characters/character.h"
 #include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/classes/ref_counted.hpp"
+#include "godot_cpp/variant/callable.hpp"
 #include "godot_cpp/variant/dictionary.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "state.h"
@@ -34,6 +35,8 @@ public:
     String get_current_state();
     uint16_t get_states_count();
     void update(double_t p_delta);
+
+    void add_transition(String name, Callable& p_function);
 };
 
 

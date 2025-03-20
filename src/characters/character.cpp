@@ -23,21 +23,29 @@ void Character::_ready() {
     acceleration = 0.2f;
     friction = 0.2f;
     display_name = "No name";
+    move_direction = Vector2(0.0f, 0.0f);
 
     TypedArray<Node> childs = get_children();
 
-    for (real_t i = 0; i < childs.size(); i++) {
+    for (size_t i = 0; i < childs.size(); i++) {
         if (auto anim = Object::cast_to<AnimationPlayer>(childs[i])) {
             animation_player = anim;
             break;
         }
     }
+    set_physics_process(true);
 }
 
 void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_life"), &Character::get_life);
     ClassDB::bind_method(D_METHOD("set_life", "p_life"), &Character::set_life);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "life"), "set_life", "get_life");
+
+    ClassDB::bind_method(D_METHOD("get_move_direction"), &Character::get_move_direction);
+    ClassDB::bind_method(D_METHOD("set_move_direction", "p_move_direction"),
+                         &Character::set_move_direction);
+    ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "move_direction"), "set_move_direction",
+                 "get_move_direction");
 
     ClassDB::bind_method(D_METHOD("get_acceleration"), &Character::get_acceleration);
     ClassDB::bind_method(D_METHOD("set_acceleration", "p_acceleration"),
@@ -59,7 +67,7 @@ void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_display_name"), &Character::get_display_name);
     ClassDB::bind_method(D_METHOD("set_display_name", "p_display_name"),
                          &Character::set_display_name);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "display_name"), "set_display_name",
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name",
                  "get_display_name");
 }
 Character::Character() {
@@ -92,27 +100,26 @@ void Character::move(Vector2 p_direction) {
 }
 
 void Character::apply_friction() {
-    Vector2 currentVelocity = get_velocity();
-    Vector2 new_velocity;
+    Vector2 new_velocity = get_velocity();
+    new_velocity.x = Math::lerp(new_velocity.x, 0.0f, friction);
+    new_velocity.y = Math::lerp(new_velocity.y, 0.0f, friction);
 
-    new_velocity.x = Math::lerp(currentVelocity.x, 0.0f, friction);
-    new_velocity.y = Math::lerp(currentVelocity.y, 0.0f, friction);
+    if (new_velocity.length_squared() < 0.01f) {
+        new_velocity = Vector2(0.0f, 0.0f);
+    }
 
     set_velocity(new_velocity);
 }
 
 void Character::update_look_direction() {
-    auto velocity = get_velocity();
-
-    if (velocity.length_squared() == 0) {
+    if (get_velocity().length_squared() == 0) {
         look_direction = DOWN;
         return;
     }
-    if (Math::abs(velocity.x) > Math::abs(velocity.y)) {
-        look_direction = (velocity.x > 0.0f) ? RIGHT : LEFT;
-    } else {
-        look_direction = (velocity.y > 0.0f) ? DOWN : UP;
-    }
+
+    look_direction = (Math::abs(get_velocity().x) > Math::abs(get_velocity().y))
+                         ? (get_velocity().x > 0.0f ? RIGHT : LEFT)
+                         : (get_velocity().y > 0.0f ? DOWN : UP);
 }
 
 String Character::get_look_direction() {
@@ -128,7 +135,13 @@ String Character::get_look_direction() {
     }
 }
 
-void Character::_physics_process(double_t p_delta) {}
+void Character::_physics_process(double_t p_delta) {
+    if (move_direction.length_squared() > 0) {
+        move(move_direction);
+    } else {
+        apply_friction();
+    }
+}
 
 float_t Character::get_life() { return life; }
 
@@ -145,6 +158,10 @@ void Character::set_acceleration(float_t p_acceleration) { acceleration = p_acce
 float_t Character::get_friction() { return friction; }
 
 void Character::set_friction(float_t p_friction) { friction = p_friction; }
+
+Vector2 Character::get_move_direction() { return move_direction; }
+
+void Character::set_move_direction(Vector2 p_move_direction) { move_direction = p_move_direction; }
 
 String Character::get_display_name() { return display_name; }
 

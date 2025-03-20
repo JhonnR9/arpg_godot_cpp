@@ -13,7 +13,8 @@ protected:
 
 public:
   Player();
-  virtual void _physics_process(double_t delta) override;
+
+  StateMachine* get_state_machine();
   virtual void _process(double_t delta) override;
   virtual	void _ready() override;
 };

@@ -168,6 +168,7 @@ autoplay = "idle_down"
 
 [node name="NPC" type="NPC" parent="."]
 resource = ExtResource("2_epypp")
+acceleration = nan
 position = Vector2(199, 50)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPC"]

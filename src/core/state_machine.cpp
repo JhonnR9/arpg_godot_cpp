@@ -1,5 +1,6 @@
 #include "state_machine.h"
 #include "godot_cpp/classes/object.hpp"
+#include "godot_cpp/variant/callable.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 
@@ -45,6 +46,11 @@ void StateMachine::update(double_t p_delta)
             state->on_state_run(p_delta);
         }
     }
+}
+
+void StateMachine::add_transition(String name, Callable& p_function)
+{
+    
 }
 
 

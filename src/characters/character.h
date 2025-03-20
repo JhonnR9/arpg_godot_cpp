@@ -22,6 +22,7 @@ class Character : public CharacterBody2D {
 	float_t max_move_speed;
 	float_t acceleration;
 	float_t friction;
+	Vector2 move_direction;
 
 	//nodes
 	AnimationPlayer* animation_player;
@@ -65,6 +66,8 @@ public:
 	float_t get_friction();
 	void set_friction(float_t p_friction);
 	
+	Vector2 get_move_direction();
+	void set_move_direction(Vector2 p_move_direction);
 };
 
 #endif //  CHARACTER_H
