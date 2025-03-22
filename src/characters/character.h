@@ -3,13 +3,16 @@
 #define CHARACTER_H
 
 
+#include "core/command.h"
 #include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/character_body2d.hpp"
+#include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/variant/node_path.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include "core/state_machine.h"
 #include <cmath>
+#include <cstddef>
 
 using namespace godot;
 
@@ -23,6 +26,7 @@ class Character : public CharacterBody2D {
 	float_t acceleration;
 	float_t friction;
 	Vector2 move_direction;
+	Vector<Ref<Command>> commands;
 
 	//nodes
 	AnimationPlayer* animation_player;
@@ -32,16 +36,20 @@ class Character : public CharacterBody2D {
 	};
 
 	LookDirection look_direction;
+	Ref<StateMachine> state_machine;
 	
 protected:
 	static void _bind_methods();
-	Ref<StateMachine> state_machine;
 
 public:
 	Character();
 
 	virtual void _ready()override;
-
+	void remove_last_command();
+	size_t get_commands_size();
+	Ref<Command> get_last_command();
+    void add_command(Ref<Command> p_command);
+    void clear_all_commands();
 	void move(Vector2 p_direction);
 	void apply_friction();
 	void update_look_direction();

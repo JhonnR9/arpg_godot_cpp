@@ -2,10 +2,12 @@
 
 #include <cmath>
 
+#include "core/command.h"
 #include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/node.hpp"
 #include "godot_cpp/classes/object.hpp"
+#include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/core/class_db.hpp"
 #include "godot_cpp/core/math.hpp"
 #include "godot_cpp/core/object.hpp"
@@ -17,13 +19,7 @@
 #include "godot_cpp/variant/vector3.hpp"
 
 void Character::_ready() {
-    life = 100.0f;
-    max_life = 100.0f;
-    max_move_speed = 100.0f;
-    acceleration = 0.2f;
-    friction = 0.2f;
-    display_name = "No name";
-    move_direction = Vector2(0.0f, 0.0f);
+ 
 
     TypedArray<Node> childs = get_children();
 
@@ -35,10 +31,23 @@ void Character::_ready() {
     }
     set_physics_process(true);
 }
-StateMachine* Character::get_state_machine()
-{
-    return state_machine.ptr();
+
+void Character::remove_last_command() { commands.remove_at(commands.size() - 1); }
+
+size_t Character::get_commands_size() { return commands.size(); }
+
+Ref<Command> Character::get_last_command() {
+    if (commands.size() != 0) {
+        return commands[commands.size() - 1];
+    }
+
+    return nullptr;
 }
+
+void Character::add_command(Ref<Command> p_command) { commands.append(p_command); }
+
+void Character::clear_all_commands() { commands.clear(); }
+StateMachine* Character::get_state_machine() { return state_machine.ptr(); }
 void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_life"), &Character::get_life);
     ClassDB::bind_method(D_METHOD("set_life", "p_life"), &Character::set_life);
@@ -77,6 +86,14 @@ Character::Character() {
     set_physics_process(true);
     look_direction = LookDirection::DOWN;
     state_machine.instantiate();
+
+    life = 100.0f;
+    max_life = 100.0f;
+    max_move_speed = 100.0f;
+    acceleration = 0.2f;
+    friction = 0.2f;
+    display_name = "No name";
+    move_direction = Vector2(0.0f, 0.0f);
 }
 
 void Character::move(Vector2 p_direction) {
@@ -140,7 +157,7 @@ String Character::get_look_direction() {
 }
 
 void Character::_physics_process(double_t p_delta) {
-    if (move_direction.length_squared() > 0) {
+    if (move_direction.length_squared() > 0.1) {
         move(move_direction);
     } else {
         apply_friction();
@@ -152,6 +169,7 @@ float_t Character::get_life() { return life; }
 void Character::set_life(float_t p_life) { life = p_life; }
 
 float_t Character::get_max_move_speed() { return max_move_speed; }
+
 
 void Character::set_max_move_speed(float_t p_max_move_speed) { max_move_speed = p_max_move_speed; }
 

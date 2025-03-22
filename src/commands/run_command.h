@@ -14,8 +14,11 @@ class RunCommand : public Command {
 
     Vector2 direction;
     Character* character;
+    protected:
+    static void _bind_methods();
 
    public:
+   RunCommand()=default;
    RunCommand(Character* p_character, Vector2 p_direction);
 
    virtual void run(float_t p_delta) override;

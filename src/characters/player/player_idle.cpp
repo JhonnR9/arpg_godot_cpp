@@ -1,19 +1,27 @@
 #include "player_idle.h"
-#include <functional>
 
-#include "godot_cpp/classes/input.hpp"
+
+#include "commands/run_command.h"
+#include "commands/stop_command.h"
+#include "core/command.h"
+
 #include "godot_cpp/classes/object.hpp"
-#include "player.h"
+
 
 void PlayerIdle::on_state_run(double_t p_delta) {
-    Input *input = Input::get_singleton();
-    if (input->is_action_just_pressed("up") || input->is_action_just_pressed("down") ||
-        input->is_action_just_pressed("left") ||input->is_action_just_pressed("right")) {
-        if (Player* player = Object::cast_to<Player>(owner)) {
-            owner->set_move_direction(
-                Input::get_singleton()->get_vector("left", "right", "up", "down"));
-            player->get_state_machine()->set_state("run");
+
+    if (owner->get_commands_size() > 0){
+
+        Command* command = owner->get_last_command().ptr();
+
+        if (Object::cast_to<RunCommand>(command)){
+            command->run(p_delta);
+            owner->get_state_machine()->set_state("run");
+            
+        }else if (Object::cast_to<StopCommand>(command)){
+           command->run(p_delta);
         }
+        owner->remove_last_command();
     }
 }
 

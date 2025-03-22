@@ -10,6 +10,8 @@ using namespace godot;
 class Command : public RefCounted{
     GDCLASS(Command, RefCounted)
 
+    protected:
+    static void _bind_methods();
     public:
     virtual void run(float_t delta);
 };
