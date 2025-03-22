@@ -1,11 +1,13 @@
 #ifndef __STATE_H__
 #define __STATE_H__
 
-#include "characters/character.h"
 #include "godot_cpp/classes/ref_counted.hpp"
 #include "godot_cpp/classes/wrapped.hpp"
 
 using namespace godot;
+
+class Character;  // Forward declaration
+
 
 class State : public RefCounted {
   GDCLASS(State, RefCounted)

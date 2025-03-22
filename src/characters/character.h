@@ -2,16 +2,16 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+
 #include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/character_body2d.hpp"
 #include "godot_cpp/variant/node_path.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
+#include "core/state_machine.h"
 #include <cmath>
 
 using namespace godot;
-
-
 
 class Character : public CharacterBody2D {
 	GDCLASS(Character, CharacterBody2D);
@@ -35,6 +35,7 @@ class Character : public CharacterBody2D {
 	
 protected:
 	static void _bind_methods();
+	Ref<StateMachine> state_machine;
 
 public:
 	Character();
@@ -45,6 +46,7 @@ public:
 	void apply_friction();
 	void update_look_direction();
 	String get_look_direction();
+	StateMachine* get_state_machine();
 
 	virtual void _physics_process(double_t p_delta) override;
 

@@ -1,7 +1,6 @@
 #ifndef __STATE_MACHINE_H__
 #define __STATE_MACHINE_H__
 
-#include "characters/character.h"
 #include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/classes/ref_counted.hpp"
 #include "godot_cpp/variant/callable.hpp"
@@ -11,7 +10,7 @@
 #include <cstdint>
 
 
-
+class Character;  // Forward declaration
 using namespace godot;
 
 class StateMachine: public RefCounted {

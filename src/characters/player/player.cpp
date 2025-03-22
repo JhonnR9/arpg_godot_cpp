@@ -13,14 +13,10 @@
 void Player::_bind_methods() {}
 
 Player::Player() {
-    state_machine.instantiate();
     state_machine->set_character(this);
 }
 
-StateMachine* Player::get_state_machine()
-{
-    return state_machine.ptr();
-}
+
 
 
 void Player::_process(double_t p_delta) { state_machine->update(p_delta); }

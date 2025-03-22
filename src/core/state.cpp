@@ -1,5 +1,6 @@
 
 #include "state.h"
+#include "characters/character.h"
 
 void State::_bind_methods() {}
 

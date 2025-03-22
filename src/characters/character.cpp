@@ -35,7 +35,10 @@ void Character::_ready() {
     }
     set_physics_process(true);
 }
-
+StateMachine* Character::get_state_machine()
+{
+    return state_machine.ptr();
+}
 void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_life"), &Character::get_life);
     ClassDB::bind_method(D_METHOD("set_life", "p_life"), &Character::set_life);
@@ -73,6 +76,7 @@ void Character::_bind_methods() {
 Character::Character() {
     set_physics_process(true);
     look_direction = LookDirection::DOWN;
+    state_machine.instantiate();
 }
 
 void Character::move(Vector2 p_direction) {

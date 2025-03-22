@@ -3,10 +3,13 @@
 #include "godot_cpp/variant/callable.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
+#include "characters/character.h"
+
 
 
 void StateMachine::add_state(String name, Ref<State> p_new_state) {
     states[name] = p_new_state;
+    
 }
 
 

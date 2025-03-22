@@ -18,6 +18,7 @@ sources.extend(Glob("src/characters/*.cpp"))
 sources.extend(Glob("src/characters/player/*.cpp"))
 sources.extend(Glob("src/ui/*.cpp"))
 sources.extend(Glob("src/tools/*.cpp"))
+sources.extend(Glob("src/commands/*.cpp"))
 
 
 if env["platform"] == "macos":
