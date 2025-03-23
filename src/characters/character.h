@@ -43,7 +43,7 @@ protected:
 
 public:
 	Character();
-
+	void set_animation(String p_anim_name);
 	virtual void _ready()override;
 	void remove_last_command();
 	size_t get_commands_size();

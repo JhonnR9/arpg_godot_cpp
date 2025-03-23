@@ -12,6 +12,7 @@
 #include "godot_cpp/core/math.hpp"
 #include "godot_cpp/core/object.hpp"
 #include "godot_cpp/core/property_info.hpp"
+#include "godot_cpp/variant/string_name.hpp"
 #include "godot_cpp/variant/typed_array.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
@@ -89,6 +90,18 @@ Character::Character() {
     move_direction = Vector2(0.0f, 0.0f);
 }
 
+void Character::set_animation(String p_anim_name) {
+    if (animation_player) {
+        auto new_animation_name = StringName(vformat("%s_%s", p_anim_name, get_look_direction()));
+        if (animation_player->has_animation(new_animation_name)) {
+            animation_player->play(new_animation_name);
+        } else {
+            UtilityFunctions::printerr(
+                vformat("No animation founded in %s to key %s", get_name(), new_animation_name));
+        }
+    }
+}
+
 void Character::set_movement(Vector2 p_direction) {
     Vector2 currentVelocity = get_velocity();
     Vector2 targetVelocity = p_direction.normalized() * max_move_speed;
@@ -98,8 +111,6 @@ void Character::set_movement(Vector2 p_direction) {
     new_velocity.y = Math::lerp(currentVelocity.y, targetVelocity.y, acceleration);
 
     set_velocity(new_velocity);
-
-
 }
 
 void Character::apply_movimente() {
@@ -161,9 +172,7 @@ void Character::_physics_process(double_t p_delta) {
     } else if (get_velocity().length_squared() > 0.0f) {
         apply_friction();
         apply_movimente();
-
     }
-
 }
 
 float_t Character::get_life() { return life; }

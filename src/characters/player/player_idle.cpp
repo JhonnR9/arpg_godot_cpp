@@ -26,4 +26,7 @@ void PlayerIdle::on_state_exit() {}
 
 void PlayerIdle::_bind_methods() {}
 
-void PlayerIdle::on_state_enter(Character* p_owner) { this->owner = p_owner; }
+void PlayerIdle::on_state_enter(Character* p_owner) { 
+    this->owner = p_owner;
+    p_owner->set_animation("idle");
+ }

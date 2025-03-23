@@ -169,7 +169,6 @@ frame = 1
 libraries = {
 &"": SubResource("AnimationLibrary_rj586")
 }
-autoplay = "idle_down"
 
 [node name="NPC" type="NPC" parent="."]
 resource = ExtResource("2_epypp")
