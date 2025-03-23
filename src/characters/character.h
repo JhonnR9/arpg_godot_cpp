@@ -50,11 +50,12 @@ public:
 	Ref<Command> get_last_command();
     void add_command(Ref<Command> p_command);
     void clear_all_commands();
-	void move(Vector2 p_direction);
+	void set_movement(Vector2 p_direction);
 	void apply_friction();
 	void update_look_direction();
 	String get_look_direction();
 	StateMachine* get_state_machine();
+	void apply_movimente();
 
 	virtual void _physics_process(double_t p_delta) override;
 

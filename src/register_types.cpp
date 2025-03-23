@@ -6,7 +6,6 @@
 #include "characters/player/player_idle.h"
 #include "characters/player/player_run.h"
 #include "commands/run_command.h"
-#include "commands/stop_command.h"
 #include "core/command.h"
 #include "core/state.h"
 #include "core/state_machine.h"
@@ -35,7 +34,6 @@ void initialize_arpg_module(ModuleInitializationLevel p_level) {
 
 	GDREGISTER_RUNTIME_CLASS(Command);
 	GDREGISTER_RUNTIME_CLASS(RunCommand);
-	GDREGISTER_RUNTIME_CLASS(StopCommand);
 
 }
 

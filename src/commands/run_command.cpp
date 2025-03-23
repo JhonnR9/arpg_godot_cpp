@@ -4,7 +4,7 @@
 
 void RunCommand::run(float_t p_delta) {
     if (character) {
-        character->set_move_direction(direction.normalized());
+        character->set_move_direction((character->get_move_direction() + direction).normalized());
     }
 }
 

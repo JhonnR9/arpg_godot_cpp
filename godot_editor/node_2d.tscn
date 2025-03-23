@@ -1,11 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://bmbbovs8vnafl"]
+[gd_scene load_steps=17 format=3 uid="uid://bmbbovs8vnafl"]
 
 [ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://char22.png" id="1_wtcfe"]
 [ext_resource type="JSON" path="res://data/test.json" id="2_epypp"]
 [ext_resource type="FontFile" uid="uid://bqbp3jvhqtrdd" path="res://data/fonts/dogica.ttf" id="3_epypp"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_0e48y"]
-radius = 4.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_epypp"]
+size = Vector2(8, 4)
 
 [sub_resource type="Animation" id="Animation_0hol4"]
 length = 0.001
@@ -98,6 +98,9 @@ _data = {
 &"idle_up": SubResource("Animation_d21ai")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0hol4"]
+size = Vector2(12, 6)
+
 [sub_resource type="Animation" id="Animation_kdubu"]
 length = 0.001
 tracks/0/type = "value"
@@ -148,11 +151,12 @@ y_sort_enabled = true
 
 [node name="Player" type="Player" parent="."]
 acceleration = 0.02
-friction = 0.9
+friction = 0.09
 position = Vector2(25, 117)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-shape = SubResource("CircleShape2D_0e48y")
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_epypp")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 position = Vector2(0, -12)
@@ -173,7 +177,8 @@ acceleration = nan
 position = Vector2(199, 50)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPC"]
-shape = SubResource("CircleShape2D_0e48y")
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_0hol4")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="NPC"]
 libraries = {

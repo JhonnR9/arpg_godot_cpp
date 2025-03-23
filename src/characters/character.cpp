@@ -19,8 +19,6 @@
 #include "godot_cpp/variant/vector3.hpp"
 
 void Character::_ready() {
- 
-
     TypedArray<Node> childs = get_children();
 
     for (size_t i = 0; i < childs.size(); i++) {
@@ -48,26 +46,21 @@ void Character::add_command(Ref<Command> p_command) { commands.append(p_command)
 
 void Character::clear_all_commands() { commands.clear(); }
 StateMachine* Character::get_state_machine() { return state_machine.ptr(); }
+
 void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_life"), &Character::get_life);
     ClassDB::bind_method(D_METHOD("set_life", "p_life"), &Character::set_life);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "life"), "set_life", "get_life");
 
-    ClassDB::bind_method(D_METHOD("get_move_direction"), &Character::get_move_direction);
-    ClassDB::bind_method(D_METHOD("set_move_direction", "p_move_direction"),
-                         &Character::set_move_direction);
-    ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "move_direction"), "set_move_direction",
-                 "get_move_direction");
-
     ClassDB::bind_method(D_METHOD("get_acceleration"), &Character::get_acceleration);
     ClassDB::bind_method(D_METHOD("set_acceleration", "p_acceleration"),
                          &Character::set_acceleration);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0,1,0.01"),
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.01,1,0.01"),
                  "set_acceleration", "get_acceleration");
 
     ClassDB::bind_method(D_METHOD("get_friction"), &Character::get_friction);
     ClassDB::bind_method(D_METHOD("set_friction", "p_friction"), &Character::set_friction);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0,1,0.01"),
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"),
                  "set_friction", "get_friction");
 
     ClassDB::bind_method(D_METHOD("get_max_move_speed"), &Character::get_max_move_speed);
@@ -96,7 +89,7 @@ Character::Character() {
     move_direction = Vector2(0.0f, 0.0f);
 }
 
-void Character::move(Vector2 p_direction) {
+void Character::set_movement(Vector2 p_direction) {
     Vector2 currentVelocity = get_velocity();
     Vector2 targetVelocity = p_direction.normalized() * max_move_speed;
 
@@ -106,6 +99,10 @@ void Character::move(Vector2 p_direction) {
 
     set_velocity(new_velocity);
 
+
+}
+
+void Character::apply_movimente() {
     if (move_and_slide()) {
         for (int i = 0; i < get_slide_collision_count(); i++) {
             Ref<KinematicCollision2D> collision = get_slide_collision(i);
@@ -157,11 +154,16 @@ String Character::get_look_direction() {
 }
 
 void Character::_physics_process(double_t p_delta) {
-    if (move_direction.length_squared() > 0.1) {
-        move(move_direction);
-    } else {
+    if (move_direction.length_squared() > 0.01f) {
+        set_movement(move_direction);
+        apply_movimente();
+
+    } else if (get_velocity().length_squared() > 0.0f) {
         apply_friction();
+        apply_movimente();
+
     }
+
 }
 
 float_t Character::get_life() { return life; }
@@ -169,7 +171,6 @@ float_t Character::get_life() { return life; }
 void Character::set_life(float_t p_life) { life = p_life; }
 
 float_t Character::get_max_move_speed() { return max_move_speed; }
-
 
 void Character::set_max_move_speed(float_t p_max_move_speed) { max_move_speed = p_max_move_speed; }
 

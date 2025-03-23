@@ -7,7 +7,6 @@
 class Player : public Character {
   GDCLASS(Player, Character);
 
-
 protected:
   static void _bind_methods();
 

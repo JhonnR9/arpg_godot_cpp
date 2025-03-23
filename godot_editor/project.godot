@@ -62,4 +62,4 @@ iteract={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=3
-environment/defaults/default_clear_color=Color(0.174347, 0.339466, 0.264546, 1)
+environment/defaults/default_clear_color=Color(0.169245, 0.169245, 0.169245, 1)

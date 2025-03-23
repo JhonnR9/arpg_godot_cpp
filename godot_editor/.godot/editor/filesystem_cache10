@@ -1,10 +1,10 @@
 affd29dcfc892077fd5194ae1cd3f129
-::res://::1742680585
-canvas_layer.gd::GDScript::5390392408085968470::1742658924::0::1::::<>CanvasLayer<><>0<>0<><>::
+::res://::1742759846
+canvas_layer.gd::GDScript/GDScript::5390392408085968470::1742658924::0::1::::<>CanvasLayer<><>0<>0<><>::
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1741703960::1741736682::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
 dd.aseprite::PackedDataContainer/PackedDataContainer::5393622585280809904::1742134119::1742134120::1::::<><><>0<>0<>000076db0a959a7fcb0366a0ccd27821<>res://.godot/imported/dd.aseprite-fb4037d1f8fd386ed95c7c2695ee93fc.res::
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1741696887::1741736682::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-node_2d.tscn::PackedScene::3230838035535760141::1742664157::0::1::::<><><>0<>0<><>::uid://tlssw48lru1w::::res://char22.png<>res://data/test.json<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf
+node_2d.tscn::PackedScene::3230838035535760141::1742759173::0::1::::<><><>0<>0<><>::uid://tlssw48lru1w::::res://char22.png<>res://data/test.json<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf
 player.tscn::PackedScene/PackedScene::8664568732048542506::1741994666::0::1::::<><><>0<>0<><>::res://data/test.json
 ::res://addons/::1742134114
 ::res://addons/AsepriteWizard/::1742133959
@@ -114,7 +114,7 @@ resource_tree.gd::GDScript/GDScript::2876818483144488404::1742133958::0::1::::<>
 resource_tree.tscn::PackedScene/PackedScene::5371907658088870246::1742133958::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/resource_tree.gd<>res://addons/AsepriteWizard/interface/imports_manager/tree_filter_field.gd
 tree_selection_confirmation_warning.gd::GDScript/GDScript::7019978174648184083::1742133958::0::1::::<>VBoxContainer<><>0<>1<><>::
 tree_selection_confirmation_warning.tscn::PackedScene/PackedScene::1136156742705764826::1742133958::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/tree_selection_confirmation_warning.gd
-::res://bin/::1742680578
+::res://bin/::1742759841
 arpg.gdextension::GDExtension/GDExtension::4811481445974584174::1741696824::0::1::::<><><>0<>0<><>::
 ::res://data/::1741866779
 test.json::JSON/JSON::-1::1741866779::0::1::::<><><>0<>0<><>::

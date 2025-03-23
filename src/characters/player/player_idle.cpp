@@ -2,7 +2,6 @@
 
 
 #include "commands/run_command.h"
-#include "commands/stop_command.h"
 #include "core/command.h"
 
 #include "godot_cpp/classes/object.hpp"
@@ -18,8 +17,6 @@ void PlayerIdle::on_state_run(double_t p_delta) {
             command->run(p_delta);
             owner->get_state_machine()->set_state("run");
             
-        }else if (Object::cast_to<StopCommand>(command)){
-           command->run(p_delta);
         }
         owner->remove_last_command();
     }
