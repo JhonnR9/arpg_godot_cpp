@@ -10,7 +10,7 @@ void PlayerRun::_bind_methods() {}
 
 void PlayerRun::on_state_enter(Character* p_owner) {
     this->owner = p_owner;
-    //p_owner->set_animation("run");
+    p_owner->set_animation("idle");
 }
 
 void PlayerRun::on_state_run(double_t p_delta) {
