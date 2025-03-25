@@ -14,15 +14,18 @@ void PlayerRun::on_state_enter(Character* p_owner) {
 }
 
 void PlayerRun::on_state_run(double_t p_delta) {
-    if (owner->get_commands_size() > 0) {
-        Command* command = owner->get_last_command().ptr();
 
-        if (auto run_command = Object::cast_to<RunCommand>(command)) {
-            run_command->run(p_delta);
-        }
+    if (Command* command = owner->get_last_command().ptr()) {
+
+        if (Object::cast_to<RunCommand>(command)) {
+            command->run(p_delta);
+        } 
         owner->remove_last_command();
+    }else {
+        owner->set_move_direction(Vector2(0.0f, 0.0f));
+    }
 
-    } else {
+    if (owner->get_velocity().length_squared() < 0.01f) {
         owner->get_state_machine()->set_state("idle");
     }
 }

@@ -27,7 +27,7 @@ void Player::_bind_methods() {}
 Player::Player() { get_state_machine()->set_character(this); }
 
 void Player::_process(double_t p_delta) {
-    Character::_process(p_delta);
+  
     Input *input = Input::get_singleton();
     auto dir = input->get_vector(INPUT_LEFT, INPUT_RIGHT, INPUT_UP, INPUT_DOWN);
 
@@ -35,6 +35,7 @@ void Player::_process(double_t p_delta) {
         add_command(Ref<RunCommand>(memnew(RunCommand(this, dir))));
     }
     get_state_machine()->update(p_delta);
+    Character::_process(p_delta);
 }
 
 void Player::_ready() {

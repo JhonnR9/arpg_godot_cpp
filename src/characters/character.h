@@ -21,7 +21,7 @@ using namespace godot;
 class Character : public CharacterBody2D {
     GDCLASS(Character, CharacterBody2D);
 
-private:
+   private:
     // Character attributes
     String display_name;
     float life;
@@ -31,33 +31,35 @@ private:
     float friction;
     Vector2 move_direction;
     Vector<Ref<Command>> commands;
-	String current_animation;
+    String current_animation;
 
     // Nodes and Objects
     AnimationPlayer* animation_player;
     Ref<StateMachine> state_machine;
 
     // Enum for movement directions
-    enum LookDirection {
-        UP, DOWN, LEFT, RIGHT
-    };
+    enum LookDirection { UP, DOWN, LEFT, RIGHT };
 
     LookDirection look_direction;
 
-protected:
+   protected:
     static void _bind_methods();
 
-public:
+   public:
     Character();
 
     // Animation methods
     void set_animation(String p_anim_name);
-	String get_look_direction() const;
+    String get_look_direction() const;
 
+   private:
+    void update_animation();
+
+   public:
     // Initialization methods
     virtual void _ready() override;
     virtual void _physics_process(double p_delta) override;
-	virtual void _process(double p_delta) override;
+    virtual void _process(double p_delta) override;
 
     // Command management
     void add_command(Ref<Command> p_command);
@@ -71,7 +73,6 @@ public:
     void apply_friction();
     void update_look_direction();
     void apply_movement();
-
 
     // Getters and setters
     float get_life() const;
@@ -99,4 +100,4 @@ public:
     StateMachine* get_state_machine();
 };
 
-#endif // CHARACTER_H
+#endif  // CHARACTER_H

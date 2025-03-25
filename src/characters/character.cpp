@@ -86,14 +86,21 @@ Ref<Command> Character::get_last_command() const {
 // Animation Handling
 // -----------------------------------------
 void Character::set_animation(String p_anim_name) {
+    auto new_animation_name = StringName(vformat("%s_%s", p_anim_name, get_look_direction()));
+    if (animation_player->has_animation(new_animation_name)) {
+        current_animation = p_anim_name;
+    }
+    else {
+        UtilityFunctions::printerr(
+            vformat("No animation found in %s for key %s", get_name(), new_animation_name));
+    }
+}
+
+void Character::update_animation()
+{
     if (animation_player) {
-        auto new_animation_name = StringName(vformat("%s_%s", p_anim_name, get_look_direction()));
-        if (animation_player->has_animation(new_animation_name)) {
-            current_animation = new_animation_name;
-        } else {
-            UtilityFunctions::printerr(
-                vformat("No animation found in %s for key %s", get_name(), new_animation_name));
-        }
+        auto new_animation_name = StringName(vformat("%s_%s", current_animation, get_look_direction()));
+        animation_player->set_current_animation(new_animation_name);
     }
 }
 
@@ -139,10 +146,9 @@ void Character::apply_friction() {
 }
 
 void Character::update_look_direction() {
-    Vector2 v = get_velocity();
-    look_direction = (Math::abs(v.x) > Math::abs(v.y))
-                         ? (v.x > 0.0f ? RIGHT : LEFT)
-                         : (v.y > 0.0f ? DOWN : UP);
+    look_direction = (Math::abs(get_velocity().x) > Math::abs(get_velocity().y))? 
+    (get_velocity().x > 0.0f ? RIGHT : LEFT)
+    : (get_velocity().y > 0.0f ? DOWN : UP);
 }
 
 String Character::get_look_direction() const {
@@ -176,12 +182,8 @@ void Character::_physics_process(double_t p_delta) {
 // -----------------------------------------
 void Character::_process(double p_delta) {
     update_look_direction();
-    if (animation_player->get_current_animation() != current_animation) {
-        animation_player->set_current_animation(current_animation);
-        animation_player->play();
-       
-    }
-    UtilityFunctions::print(animation_player->get_current_animation());
+    update_animation();
+
 }
 
 // -----------------------------------------
