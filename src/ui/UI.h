@@ -3,7 +3,7 @@
 #define  UI_H
 
 #include "godot_cpp/classes/control.hpp"
-#include "godot_cpp/classes/label.hpp"
+#include "godot_cpp/classes/rich_text_label.hpp"
 
 using namespace godot;
 
@@ -12,7 +12,7 @@ class UI : public Control {
 
 protected:
     static void _bind_methods();
-    Label* label;
+    RichTextLabel* label;
 public:
     UI();
     virtual void _ready() override;

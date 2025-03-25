@@ -1,12 +1,8 @@
 #include "character.h"
 
-// Standard Library
 #include <cmath>
 
-// Project includes
 #include "core/command.h"
-
-// Godot includes
 #include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/node.hpp"
@@ -40,6 +36,7 @@ const char* LOOK_RIGHT = "right";
 Character::Character() {
     set_physics_process(true);
     set_process(true);
+
     look_direction = LookDirection::DOWN;
     state_machine.instantiate();
 
@@ -50,18 +47,6 @@ Character::Character() {
     friction = 0.2f;
     display_name = DEFAULT_DISPLAY_NAME;
     move_direction = Vector2(0.0f, 0.0f);
-}
-
-void Character::_ready() {
-    TypedArray<Node> childs = get_children();
-
-    for (size_t i = 0; i < childs.size(); i++) {
-        if (auto anim = Object::cast_to<AnimationPlayer>(childs[i])) {
-            animation_player = anim;
-            break;
-        }
-    }
-    set_physics_process(true);
 }
 
 // -----------------------------------------
@@ -89,18 +74,19 @@ void Character::set_animation(String p_anim_name) {
     auto new_animation_name = StringName(vformat("%s_%s", p_anim_name, get_look_direction()));
     if (animation_player->has_animation(new_animation_name)) {
         current_animation = p_anim_name;
-    }
-    else {
+    } else {
         UtilityFunctions::printerr(
             vformat("No animation found in %s for key %s", get_name(), new_animation_name));
     }
 }
 
-void Character::update_animation()
-{
+void Character::update_animation() {
     if (animation_player) {
-        auto new_animation_name = StringName(vformat("%s_%s", current_animation, get_look_direction()));
-        animation_player->set_current_animation(new_animation_name);
+        auto new_animation_name =
+            StringName(vformat("%s_%s", current_animation, get_look_direction()));
+        if (animation_player->get_current_animation() != new_animation_name) {
+            animation_player->set_current_animation(new_animation_name);
+        }
     }
 }
 
@@ -146,9 +132,12 @@ void Character::apply_friction() {
 }
 
 void Character::update_look_direction() {
-    look_direction = (Math::abs(get_velocity().x) > Math::abs(get_velocity().y))? 
-    (get_velocity().x > 0.0f ? RIGHT : LEFT)
-    : (get_velocity().y > 0.0f ? DOWN : UP);
+    if (get_velocity().length_squared() > 0.01f) {
+        Vector2 velocity = get_velocity();
+        look_direction = (Math::abs(velocity.x) > Math::abs(velocity.y))
+                             ? (velocity.x > 0.0f ? RIGHT : LEFT)
+                             : (velocity.y > 0.0f ? DOWN : UP);
+    }
 }
 
 String Character::get_look_direction() const {
@@ -166,24 +155,32 @@ String Character::get_look_direction() const {
 }
 
 // -----------------------------------------
-// Physics Processing
+// Life cycle methods
 // -----------------------------------------
+void Character::_ready() {
+    TypedArray<Node> childs = get_children();
+
+    for (size_t i = 0; i < childs.size(); i++) {
+        if (auto anim = Object::cast_to<AnimationPlayer>(childs[i])) {
+            animation_player = anim;
+            break;
+        }
+    }
+}
 void Character::_physics_process(double_t p_delta) {
     if (move_direction.length_squared() > 0.01f) {
         set_movement(move_direction);
         apply_movement();
-    } else if (get_velocity().length_squared() > 0.0f) {
+    } else if (get_velocity().length_squared() > 0.02f) {
         apply_friction();
         apply_movement();
     }
 }
-// -----------------------------------------
-// Processing
-// -----------------------------------------
+
 void Character::_process(double p_delta) {
+    state_machine->update(p_delta);
     update_look_direction();
     update_animation();
-
 }
 
 // -----------------------------------------

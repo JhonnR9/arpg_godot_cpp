@@ -17,7 +17,7 @@ void UI::_bind_methods(){
 
 void UI::_ready() {
     set_visible(false);
-    label = get_node<Label>("PanelContainer/Label");
+    label = get_node<RichTextLabel>("PanelContainer/Label");
     
     Node* root_tree = get_tree()->get_current_scene();
     ARPG* root = Object::cast_to<ARPG>(root_tree);
@@ -32,8 +32,11 @@ void UI::_ready() {
 
 
 void UI::_on_show_dialog(const String &p_text){
-    label->set_text(p_text);
-    set_visible(true);
+    if (label){
+        label->set_text(p_text);
+        set_visible(true);
+    }
+
 }
 
 void UI::_on_hide_dialog(){

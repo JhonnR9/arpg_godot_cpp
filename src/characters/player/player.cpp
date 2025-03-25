@@ -6,35 +6,27 @@
 #include "commands/run_command.h"
 #include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/core/memory.hpp"
-
 #include "godot_cpp/variant/vector2.hpp"
 #include "player_idle.h"
 #include "player_run.h"
 
-
+// -----------------------------------------
+// Constants
+// -----------------------------------------
 namespace {
-    constexpr const char* INPUT_LEFT = "left";
-    constexpr const char* INPUT_RIGHT = "right";
-    constexpr const char* INPUT_UP = "up";
-    constexpr const char* INPUT_DOWN = "down";
+constexpr const char* INPUT_LEFT = "left";
+constexpr const char* INPUT_RIGHT = "right";
+constexpr const char* INPUT_UP = "up";
+constexpr const char* INPUT_DOWN = "down";
 
-    constexpr const char* STATE_IDLE = "idle";
-    constexpr const char* STATE_RUN = "run";
-}
-
-void Player::_bind_methods() {}
+constexpr const char* STATE_IDLE = "idle";
+constexpr const char* STATE_RUN = "run";
+}  // namespace
 
 Player::Player() { get_state_machine()->set_character(this); }
 
 void Player::_process(double_t p_delta) {
-  
-    Input *input = Input::get_singleton();
-    auto dir = input->get_vector(INPUT_LEFT, INPUT_RIGHT, INPUT_UP, INPUT_DOWN);
-
-    if (dir.length_squared() > 0.01f) {
-        add_command(Ref<RunCommand>(memnew(RunCommand(this, dir))));
-    }
-    get_state_machine()->update(p_delta);
+    input_handle();
     Character::_process(p_delta);
 }
 
@@ -46,3 +38,15 @@ void Player::_ready() {
 
     get_state_machine()->set_state(STATE_IDLE);
 }
+
+void Player::input_handle() {
+    Input* input = Input::get_singleton();
+
+    auto dir = input->get_vector(INPUT_LEFT, INPUT_RIGHT, INPUT_UP, INPUT_DOWN);
+
+    if (dir.length_squared() > 0.01f) {
+        add_command(Ref<RunCommand>(memnew(RunCommand(this, dir))));
+    }
+}
+
+void Player::_bind_methods() {}

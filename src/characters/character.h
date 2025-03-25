@@ -1,7 +1,10 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-// Godot includes
+#include <cstddef>
+
+#include "core/command.h"
+#include "core/state_machine.h"
 #include "godot_cpp/classes/animation_player.hpp"
 #include "godot_cpp/classes/character_body2d.hpp"
 #include "godot_cpp/classes/ref.hpp"
@@ -9,12 +12,6 @@
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 
-// Project includes
-#include "core/command.h"
-#include "core/state_machine.h"
-
-// STL includes
-#include <cstddef>
 
 using namespace godot;
 
@@ -39,24 +36,25 @@ class Character : public CharacterBody2D {
 
     // Enum for movement directions
     enum LookDirection { UP, DOWN, LEFT, RIGHT };
-
     LookDirection look_direction;
 
    protected:
+    // Property Bindings
     static void _bind_methods();
 
    public:
     Character();
-
+    // Accessor for state machine
+    StateMachine* get_state_machine();
+    
     // Animation methods
     void set_animation(String p_anim_name);
     String get_look_direction() const;
-
    private:
     void update_animation();
 
    public:
-    // Initialization methods
+    //  Life cycle methods
     virtual void _ready() override;
     virtual void _physics_process(double p_delta) override;
     virtual void _process(double p_delta) override;
@@ -96,8 +94,6 @@ class Character : public CharacterBody2D {
     Vector2 get_move_direction() const;
     void set_move_direction(Vector2 p_move_direction);
 
-    // Accessor for state machine
-    StateMachine* get_state_machine();
 };
 
 #endif  // CHARACTER_H

@@ -1,3 +1,7 @@
+Panel
+HBoxContainer
+TextureRect
+RichTextLabel
 AnimationPlayer
 UI
 Label
@@ -6,8 +10,5 @@ Container
 NPC
 Player
 ARPG
-Panel
 Control
 CanvasLayer
-CollisionShape2D
-Area2D
