@@ -23,7 +23,6 @@ build/
 *.gdc
 
 # Godot GDExtension specific
-bin/
 *.gen.cpp
 *.gen.h
 
