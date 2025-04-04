@@ -4,6 +4,7 @@
 **/*.godot/tmp/
 **/*.godot/imported/
 **/*.godot/editor_settings-*
+godot_editor/.godot/
 
 # Build files
 build/
