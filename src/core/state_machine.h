@@ -10,12 +10,14 @@
 #include "godot_cpp/variant/callable.hpp"
 #include "godot_cpp/variant/dictionary.hpp"
 #include "godot_cpp/variant/string.hpp"
-#include "state.h"
 
-class Character;  // Forward declaration
+
+class Character;
+class State;
 using namespace godot;
 
 class StateMachine : public RefCounted {
+    
     GDCLASS(StateMachine, RefCounted);
 
    public:

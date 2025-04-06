@@ -18,6 +18,7 @@
 #include "godot_cpp/variant/variant.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include "godot_cpp/variant/vector3.hpp"
+#include "core/state_machine.h"
 
 // -----------------------------------------
 // Constants
@@ -213,6 +214,8 @@ void Character::_bind_methods() {
                          &Character::set_display_name);
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name",
                  "get_display_name");
+
+    ClassDB::bind_method(D_METHOD("get_state_machine"), &Character::get_state_machine);
 }
 
 // -----------------------------------------

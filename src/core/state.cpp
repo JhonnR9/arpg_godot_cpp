@@ -1,20 +1,8 @@
-
 #include "state.h"
-#include "characters/character.h"
 
-void State::_bind_methods() {}
-
-void State::on_state_enter(Character *owner)
-{
-    
+void State::_bind_methods(){
+    GDVIRTUAL_BIND(_on_state_enter, "character");
+    GDVIRTUAL_BIND(_on_state_stay, "delta");
+    GDVIRTUAL_BIND(_on_state_exit);
 }
 
-void State::on_state_run(double_t delta)
-{
-    
-}
-
-void State::on_state_exit()
-{
-    
-}
