@@ -39,7 +39,6 @@ Character::Character() {
     set_process(true);
 
     look_direction = LookDirection::DOWN;
-    state_machine.instantiate();
 
     life = 100.0f;
     max_life = 100.0f;
@@ -48,8 +47,12 @@ Character::Character() {
     friction = 0.2f;
     display_name = DEFAULT_DISPLAY_NAME;
     move_direction = Vector2(0.0f, 0.0f);
-}
 
+
+}
+Character::~Character(){
+
+}
 // -----------------------------------------
 // Command Handling
 // -----------------------------------------
@@ -177,9 +180,24 @@ void Character::_physics_process(double_t p_delta) {
         apply_movement();
     }
 }
+void Character::_notification(int what){
+    switch (what){
+      case NOTIFICATION_ENTER_TREE:
+            state_machine = Ref(memnew(StateMachine));
+            state_machine->set_character(this);
+            break;
+    
+    default:
+        break;
+    }
 
+}
 void Character::_process(double p_delta) {
-    state_machine->update(p_delta);
+    if (!state_machine.is_null() && state_machine.is_valid()) {
+        state_machine->update(p_delta);
+    }
+
+
     update_look_direction();
     update_animation();
 }
@@ -193,27 +211,20 @@ void Character::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "life"), "set_life", "get_life");
 
     ClassDB::bind_method(D_METHOD("get_acceleration"), &Character::get_acceleration);
-    ClassDB::bind_method(D_METHOD("set_acceleration", "p_acceleration"),
-                         &Character::set_acceleration);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.01,1,0.01"),
-                 "set_acceleration", "get_acceleration");
+    ClassDB::bind_method(D_METHOD("set_acceleration", "p_acceleration"), &Character::set_acceleration);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_acceleration", "get_acceleration");
 
     ClassDB::bind_method(D_METHOD("get_friction"), &Character::get_friction);
     ClassDB::bind_method(D_METHOD("set_friction", "p_friction"), &Character::set_friction);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"),
-                 "set_friction", "get_friction");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_friction", "get_friction");
 
     ClassDB::bind_method(D_METHOD("get_max_move_speed"), &Character::get_max_move_speed);
-    ClassDB::bind_method(D_METHOD("set_max_move_speed", "p_max_move_speed"),
-                         &Character::set_max_move_speed);
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed",
-                 "get_max_move_speed");
+    ClassDB::bind_method(D_METHOD("set_max_move_speed", "p_max_move_speed"), &Character::set_max_move_speed);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed", "get_max_move_speed");
 
     ClassDB::bind_method(D_METHOD("get_display_name"), &Character::get_display_name);
-    ClassDB::bind_method(D_METHOD("set_display_name", "p_display_name"),
-                         &Character::set_display_name);
-    ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name",
-                 "get_display_name");
+    ClassDB::bind_method(D_METHOD("set_display_name", "p_display_name"), &Character::set_display_name);
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name","get_display_name");
 
     ClassDB::bind_method(D_METHOD("get_state_machine"), &Character::get_state_machine);
 }
@@ -239,4 +250,4 @@ void Character::set_move_direction(Vector2 p_move_direction) { move_direction = 
 String Character::get_display_name() const { return display_name; }
 void Character::set_display_name(String p_display_name) { display_name = p_display_name; }
 
-StateMachine* Character::get_state_machine() { return state_machine.ptr(); }
+Ref<StateMachine> Character::get_state_machine() { return state_machine; }

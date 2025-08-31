@@ -31,8 +31,8 @@ class Character : public CharacterBody2D {
     String current_animation;
 
     // Nodes and Objects
-    AnimationPlayer* animation_player;
-    Ref<StateMachine> state_machine;
+    AnimationPlayer* animation_player{nullptr};  
+    Ref<StateMachine> state_machine{nullptr};
 
     // Enum for movement directions
     enum LookDirection { UP, DOWN, LEFT, RIGHT };
@@ -44,8 +44,9 @@ class Character : public CharacterBody2D {
 
    public:
     Character();
+    ~Character();
     // Accessor for state machine
-    StateMachine* get_state_machine();
+    Ref<StateMachine> get_state_machine();
     
     // Animation methods
     void set_animation(String p_anim_name);
@@ -58,6 +59,7 @@ class Character : public CharacterBody2D {
     virtual void _ready() override;
     virtual void _physics_process(double p_delta) override;
     virtual void _process(double p_delta) override;
+    void _notification(int what);
 
     // Command management
     void add_command(Ref<Command> p_command);

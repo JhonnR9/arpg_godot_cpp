@@ -1,6 +1,6 @@
 [gd_scene load_steps=19 format=3 uid="uid://bmbbovs8vnafl"]
 
-[ext_resource type="Script" uid="uid://begv0bj4o587w" path="res://scripts/player_idle_state.gd" id="1_q6r6c"]
+[ext_resource type="Script" uid="uid://5auvnmhjabvy" path="res://scripts/player_controller.gd" id="1_q6r6c"]
 [ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://char22.png" id="1_wtcfe"]
 [ext_resource type="FontFile" uid="uid://bqbp3jvhqtrdd" path="res://data/fonts/dogica.ttf" id="3_epypp"]
 [ext_resource type="FontFile" uid="uid://dxunq0i3381v8" path="res://data/fonts/dogicapixel.ttf" id="4_q6r6c"]
@@ -186,6 +186,7 @@ border_color = Color(1, 1, 1, 1)
 y_sort_enabled = true
 
 [node name="Character" type="Character" parent="."]
+position = Vector2(92, 79)
 script = ExtResource("1_q6r6c")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Character"]

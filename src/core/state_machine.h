@@ -17,16 +17,16 @@ class State;
 using namespace godot;
 
 class StateMachine : public RefCounted {
-    
+
     GDCLASS(StateMachine, RefCounted);
 
    public:
     StateMachine();
 
    private:
-    Dictionary states;
-    String current;
-    String next;
+    Dictionary states{};
+    String current{""};
+    String next{""};
     Character* character;
 
    protected:
@@ -38,9 +38,9 @@ class StateMachine : public RefCounted {
     void add_state(String p_name, Ref<State> p_new_state);
     void set_state(String p_name);
     void remove_state(String p_name);
-    String get_current_state();
-    uint16_t get_states_count();
-    void update(double_t p_delta);
+    String get_current_state() const;
+    uint16_t get_states_count() const;
+    void update(float p_delta);
 };
 
 #endif  // __STATE_MACHINE_H__

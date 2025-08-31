@@ -20,7 +20,7 @@ void initialize_arpg_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(JsonParse);
 	
 	GDREGISTER_RUNTIME_CLASS(UI);
-	GDREGISTER_RUNTIME_CLASS(StateMachine);
+	GDREGISTER_CLASS(StateMachine);
 
 	GDREGISTER_RUNTIME_CLASS(State);
 

@@ -11,6 +11,7 @@ void RunCommand::run(float_t p_delta) {
 RunCommand::RunCommand(Character* p_character, Vector2 p_direction) {
     this->direction = p_direction;
     this->character = p_character;
+    
 }
 
 void RunCommand::_bind_methods() {}
