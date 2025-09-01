@@ -62,7 +62,7 @@ class Character : public CharacterBody2D {
     void _notification(int what);
 
     // Command management
-    void add_command(Ref<Command> p_command);
+    void enqueue_command(Ref<Command> p_command);
     void remove_last_command();
     void clear_all_commands();
     size_t get_commands_size() const;

@@ -2,7 +2,6 @@
 #include <godot_cpp/core/class_db.hpp>
 #include "arpg.h"
 #include "characters/character.h"
-#include "commands/run_command.h"
 #include "core/command.h"
 #include "core/state.h"
 #include "core/state_machine.h"
@@ -25,8 +24,7 @@ void initialize_arpg_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(State);
 
 
-	GDREGISTER_RUNTIME_CLASS(Command);
-	GDREGISTER_RUNTIME_CLASS(RunCommand);
+GDREGISTER_RUNTIME_CLASS(Command);
 
 }
 

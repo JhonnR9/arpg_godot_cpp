@@ -56,19 +56,39 @@ Character::~Character(){
 // -----------------------------------------
 // Command Handling
 // -----------------------------------------
-void Character::add_command(Ref<Command> p_command) { commands.append(p_command); }
+void Character::enqueue_command(Ref<Command> p_command) {
+    if (p_command.is_null()) {
+        ERR_PRINT("Attempted to add a null command.");
+        return;
+    }
+    commands.append(p_command);
+}
 
-void Character::remove_last_command() { commands.remove_at(commands.size() - 1); }
+void Character::remove_last_command() {
+    if (commands.is_empty()) {
+        ERR_PRINT("Attempted to remove a command from an empty command list.");
+        return;
+    }
+    commands.remove_at(commands.size() - 1);
+}
 
-void Character::clear_all_commands() { commands.clear(); }
+void Character::clear_all_commands() {
+    if (!commands.is_empty()) {
+        commands.clear();
+    }
+}
 
-size_t Character::get_commands_size() const { return commands.size(); }
+size_t Character::get_commands_size() const {
+    return commands.size();
+}
 
 Ref<Command> Character::get_last_command() const {
     if (!commands.is_empty()) {
         return commands[commands.size() - 1];
+    } else {
+        ERR_PRINT("Attempted to get the last command from an empty command list.");
+        return nullptr;
     }
-    return nullptr;
 }
 
 // -----------------------------------------
@@ -197,9 +217,17 @@ void Character::_process(double p_delta) {
         state_machine->update(p_delta);
     }
 
-
     update_look_direction();
     update_animation();
+
+    if (commands.is_empty()) return;
+
+  
+    for (Ref<Command> command : commands){
+        command->_gdvirtual_run_call(p_delta);
+    }
+
+    commands.clear();
 }
 
 // -----------------------------------------
@@ -222,11 +250,18 @@ void Character::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_max_move_speed", "p_max_move_speed"), &Character::set_max_move_speed);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed", "get_max_move_speed");
 
+    ClassDB::bind_method(D_METHOD("get_move_direction"), &Character::get_move_direction);
+    ClassDB::bind_method(D_METHOD("set_move_direction", "p_max_move_speed"), &Character::set_move_direction);
+    ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "move_direction"), "set_move_direction", "get_move_direction");
+
     ClassDB::bind_method(D_METHOD("get_display_name"), &Character::get_display_name);
     ClassDB::bind_method(D_METHOD("set_display_name", "p_display_name"), &Character::set_display_name);
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name","get_display_name");
 
     ClassDB::bind_method(D_METHOD("get_state_machine"), &Character::get_state_machine);
+
+    ClassDB::bind_method(D_METHOD("add_command", "p_command"), &Character::enqueue_command);
+
 }
 
 // -----------------------------------------
@@ -250,4 +285,10 @@ void Character::set_move_direction(Vector2 p_move_direction) { move_direction = 
 String Character::get_display_name() const { return display_name; }
 void Character::set_display_name(String p_display_name) { display_name = p_display_name; }
 
-Ref<StateMachine> Character::get_state_machine() { return state_machine; }
+Ref<StateMachine> Character::get_state_machine() { 
+    if (state_machine.is_null() || !state_machine.is_valid()){
+        state_machine = Ref(memnew(StateMachine));
+        state_machine->set_character(this);
+    }
+    return state_machine; 
+}
