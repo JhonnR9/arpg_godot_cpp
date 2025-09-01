@@ -1,4 +1,1 @@
 res://node_2d.tscn
-res://scripts/player_controller.gd
-res://scripts/run_command.gd
-res://scripts/player_idle_state.gd

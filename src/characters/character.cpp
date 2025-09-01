@@ -19,16 +19,13 @@
 #include "godot_cpp/variant/vector2.hpp"
 #include "godot_cpp/variant/vector3.hpp"
 #include "core/state_machine.h"
+#include "godot_cpp/classes/object.hpp"
 
 // -----------------------------------------
 // Constants
 // -----------------------------------------
 namespace {
 const char* DEFAULT_DISPLAY_NAME = "No name";
-const char* LOOK_UP = "up";
-const char* LOOK_DOWN = "down";
-const char* LOOK_LEFT = "left";
-const char* LOOK_RIGHT = "right";
 }  // namespace
 
 // -----------------------------------------
@@ -51,7 +48,9 @@ Character::Character() {
 
 }
 Character::~Character(){
-
+    if (animation_player) {
+        animation_player->disconnect("tree_exiting", callable_mp(this, &Character::_on_animation_node_tree_exit));
+    }
 }
 // -----------------------------------------
 // Command Handling
@@ -96,6 +95,12 @@ Ref<Command> Character::get_last_command() const {
 // -----------------------------------------
 void Character::set_animation(String p_anim_name) {
     auto new_animation_name = StringName(vformat("%s_%s", p_anim_name, get_look_direction()));
+    UtilityFunctions::print("setting animation to: " , new_animation_name);
+
+    if (!animation_player){
+        UtilityFunctions::printerr("Animation player could not be null " );
+        return;
+    } 
     if (animation_player->has_animation(new_animation_name)) {
         current_animation = p_anim_name;
     } else {
@@ -112,6 +117,26 @@ void Character::update_animation() {
             animation_player->set_current_animation(new_animation_name);
         }
     }
+}
+
+bool Character::update_animation_nodes() {
+    if (animation_player){
+        return true;
+    }
+    auto last_child = get_child(get_child_count() - 1);
+    
+    if (AnimationPlayer* anin_player = Object::cast_to<AnimationPlayer>(last_child)){
+        animation_player = anin_player;
+        animation_player->connect("tree_exiting", callable_mp(this, &Character::_on_animation_node_tree_exit));
+
+        return true;
+    }
+
+    return false; 
+}
+
+void Character::_on_animation_node_tree_exit() {
+    animation_player = nullptr;
 }
 
 // -----------------------------------------
@@ -165,6 +190,11 @@ void Character::update_look_direction() {
 }
 
 String Character::get_look_direction() const {
+    const String LOOK_UP = "up";
+    const String LOOK_DOWN = "down";
+    const String LOOK_LEFT = "left";
+    const String LOOK_RIGHT = "right";
+
     switch (look_direction) {
         case UP:
             return LOOK_UP;
@@ -182,47 +212,58 @@ String Character::get_look_direction() const {
 // Life cycle methods
 // -----------------------------------------
 void Character::_ready() {
-    TypedArray<Node> childs = get_children();
-
-    for (size_t i = 0; i < childs.size(); i++) {
-        if (auto anim = Object::cast_to<AnimationPlayer>(childs[i])) {
-            animation_player = anim;
-            break;
-        }
-    }
+    
 }
 void Character::_physics_process(double_t p_delta) {
+    if (Engine::get_singleton()->is_editor_hint()) return;
+
     if (move_direction.length_squared() > 0.01f) {
-        set_movement(move_direction);
-        apply_movement();
-    } else if (get_velocity().length_squared() > 0.02f) {
-        apply_friction();
-        apply_movement();
-    }
+            set_movement(move_direction);
+            apply_movement();
+        } else if (get_velocity().length_squared() > 0.02f) {
+            apply_friction();
+            apply_movement();
+        }
 }
 void Character::_notification(int what){
     switch (what){
-      case NOTIFICATION_ENTER_TREE:
+        case NOTIFICATION_ENTER_TREE:
             state_machine = Ref(memnew(StateMachine));
             state_machine->set_character(this);
-            break;
-    
+        break;
+        case NOTIFICATION_CHILD_ORDER_CHANGED:
+            has_animation_node = update_animation_nodes();
+        break;
+
     default:
         break;
     }
 
+}
+PackedStringArray Character::_get_configuration_warnings() const { 
+    PackedStringArray warnings = CharacterBody2D::_get_configuration_warnings();
+
+    if (!animation_player) {
+        warnings.append("This node requires an AnimationPlayer as a child node for animations to work correctly.\n"
+                        "Without it, animation playback will not function, and related features such as state-driven animations will be disabled.\n"
+                        "Please add an AnimationPlayer node as a child of this Character.");
+    }
+
+
+    return warnings; 
 }
 void Character::_process(double p_delta) {
     if (!state_machine.is_null() && state_machine.is_valid()) {
         state_machine->update(p_delta);
     }
 
+    if (Engine::get_singleton()->is_editor_hint()) return;
+
     update_look_direction();
     update_animation();
 
     if (commands.is_empty()) return;
 
-  
     for (Ref<Command> command : commands){
         command->_gdvirtual_run_call(p_delta);
     }
@@ -259,8 +300,10 @@ void Character::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name","get_display_name");
 
     ClassDB::bind_method(D_METHOD("get_state_machine"), &Character::get_state_machine);
-
+    ClassDB::bind_method(D_METHOD("set_animation", "p_animation_name"), &Character::set_animation);
     ClassDB::bind_method(D_METHOD("add_command", "p_command"), &Character::enqueue_command);
+
+
 
 }
 

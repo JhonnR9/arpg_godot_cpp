@@ -2,7 +2,7 @@
 #define CHARACTER_H
 
 #include <cstddef>
-
+#include <godot_cpp/classes/weak_ref.hpp>
 #include "core/command.h"
 #include "core/state_machine.h"
 #include "godot_cpp/classes/animation_player.hpp"
@@ -42,7 +42,7 @@ class Character : public CharacterBody2D {
     // Property Bindings
     static void _bind_methods();
 
-   public:
+public:
     Character();
     ~Character();
     // Accessor for state machine
@@ -51,15 +51,21 @@ class Character : public CharacterBody2D {
     // Animation methods
     void set_animation(String p_anim_name);
     String get_look_direction() const;
-   private:
-    void update_animation();
 
-   public:
+private:
+    bool has_animation_node{false};
+    void update_animation();
+    bool update_animation_nodes();
+    void _on_animation_node_tree_exit();
+
+
+public:
     //  Life cycle methods
     virtual void _ready() override;
     virtual void _physics_process(double p_delta) override;
     virtual void _process(double p_delta) override;
     void _notification(int what);
+    virtual PackedStringArray _get_configuration_warnings() const override;
 
     // Command management
     void enqueue_command(Ref<Command> p_command);

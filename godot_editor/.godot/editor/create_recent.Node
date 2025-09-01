@@ -1,14 +1,14 @@
 Character
+AnimationPlayer
+Marker2D
 CharacterBody2D
 PlayerController
 Panel
 HBoxContainer
 TextureRect
 RichTextLabel
-AnimationPlayer
 UI
 Label
 PanelContainer
 Container
 ARPG
-Control
