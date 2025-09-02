@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dr61kqa4pngc6"
+path="res://.godot/imported/Soldier.aseprite-6d578c46d9df8e4800c619a3b333672e.res"
+
+[deps]
+
+source_file="res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Aseprite file/Soldier.aseprite"
+dest_files=["res://.godot/imported/Soldier.aseprite-6d578c46d9df8e4800c619a3b333672e.res"]
+
+[params]
+

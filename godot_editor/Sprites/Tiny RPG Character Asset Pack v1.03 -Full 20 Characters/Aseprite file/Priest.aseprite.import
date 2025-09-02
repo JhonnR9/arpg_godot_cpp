@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dm1iau5jldtup"
+path="res://.godot/imported/Priest.aseprite-f8d8ef04ea9ceff8fce43acc30ea5f68.res"
+
+[deps]
+
+source_file="res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Aseprite file/Priest.aseprite"
+dest_files=["res://.godot/imported/Priest.aseprite-f8d8ef04ea9ceff8fce43acc30ea5f68.res"]
+
+[params]
+

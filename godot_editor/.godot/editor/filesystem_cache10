@@ -1,8 +1,8 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1756821574
+::res://::1756821937
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1756657957::1756658490::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1756657957::1756658490::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-node_2d.tscn::PackedScene::3230838035535760141::1756819081::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
+node_2d.tscn::PackedScene/PackedScene::3230838035535760141::1756819081::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
 player.tscn::PackedScene/PackedScene::8664568732048542506::1756657957::0::1::::<><><>0<>0<><>::res://data/test.json
 ::res://addons/::1756657957
 ::res://addons/AsepriteWizard/::1756657957
@@ -1084,6 +1084,26 @@ Arrow02(100x100).png::CompressedTexture2D/CompressedTexture2D::40233447941647303
 Arrow03(32x32).png::CompressedTexture2D/CompressedTexture2D::5847833448662361946::1720640981::1756750816::1::::<><><>0<>0<>5cc70d6ddda5bd1bd8aabf0b242fdff2<>res://.godot/imported/Arrow03(32x32).png-13dd27fb9a6338bdc1fdfdb252948c04.ctex::
 Arrow03(100x100).png::CompressedTexture2D/CompressedTexture2D::4229031033515768688::1720641024::1756750816::1::::<><><>0<>0<>637bd86f223451b99c6e94fda08fc048<>res://.godot/imported/Arrow03(100x100).png-e2fc4057f22b5faa87c9eb56181d4aa2.ctex::
 ::res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Aseprite file/::1756750809
+Archer.aseprite::PackedDataContainer::9012065481998941329::1720900350::1756821938::1::::<><><>0<>0<>86b94f2f15c69849b83375a1e7cdbc26<>res://.godot/imported/Archer.aseprite-8e0c180332acbd32e65c889d9087926a.res::
+Armored Axeman.aseprite::PackedDataContainer::3339352626525622778::1720905963::1756821938::1::::<><><>0<>0<>e23feed8323ebf94996412b3098242f0<>res://.godot/imported/Armored Axeman.aseprite-085e77a140d8a9181b61ec4d4ec0fcd9.res::
+Armored Orc.aseprite::PackedDataContainer::9017341809389494897::1720906160::1756821938::1::::<><><>0<>0<>845083b5522b838ad23c31865d2a1256<>res://.godot/imported/Armored Orc.aseprite-f81186b059f6e5a00126e2e80f0de089.res::
+Armored Skeleton.aseprite::PackedDataContainer::7343798673501931149::1720906405::1756821938::1::::<><><>0<>0<>b4524fa8b498505311a3361b432dda53<>res://.godot/imported/Armored Skeleton.aseprite-369f5c496622378b14dd59bd7720cc07.res::
+Elite Orc.aseprite::PackedDataContainer::1560999147530543144::1720901462::1756821938::1::::<><><>0<>0<>29a7ea885bf5359b34ff9e429f1b859e<>res://.godot/imported/Elite Orc.aseprite-4b5f729848f3708d14977fd751283c9e.res::
+Greatsword Skeleton.aseprite::PackedDataContainer::5165739377996250813::1720898345::1756821938::1::::<><><>0<>0<>506ffd8dd3f1135f177fdc675b52c7c5<>res://.godot/imported/Greatsword Skeleton.aseprite-a81893c068640f0de68a577574008bf2.res::
+Knight Templar.aseprite::PackedDataContainer::6036803976058447470::1720906685::1756821938::1::::<><><>0<>0<>97bdccf1eadc278a2f7ed8645756419d<>res://.godot/imported/Knight Templar.aseprite-f4c3a00f2750767dd6e502a551230b16.res::
+Knight.aseprite::PackedDataContainer::2328213893358371117::1720902997::1756821938::1::::<><><>0<>0<>c49d0af73edfbc1ae2ed5dfd7bacacbb<>res://.godot/imported/Knight.aseprite-e2b4fd0ceca9efd75b6fb4b660304055.res::
+Lancer.aseprite::PackedDataContainer::1466684533199758382::1720903370::1756821938::1::::<><><>0<>0<>1bd0f6b2a07e47d44b7aedf2681b6920<>res://.godot/imported/Lancer.aseprite-7c7b51b271e8e32c43663c8526b7c19b.res::
+Orc rider.aseprite::PackedDataContainer::612248906357445158::1720903715::1756821938::1::::<><><>0<>0<>b6751112c8cfad6aa98319dbb360f6ee<>res://.godot/imported/Orc rider.aseprite-d42da914f6ccd2e56b408d194b6aff53.res::
+Orc.aseprite::PackedDataContainer::2304251210057542109::1720899225::1756821938::1::::<><><>0<>0<>611d3ee1013ac375ea469f3ff81dd0f5<>res://.godot/imported/Orc.aseprite-61cc6a14a1fca352669c9d17649a2cfc.res::
+Priest.aseprite::PackedDataContainer::8055688829518272107::1720903815::1756821937::1::::<><><>0<>0<>fcb98103091a4b58d41b1afe834d4e77<>res://.godot/imported/Priest.aseprite-f8d8ef04ea9ceff8fce43acc30ea5f68.res::
+Skeleton Archer.aseprite::PackedDataContainer::1401091322642221809::1720904742::1756821937::1::::<><><>0<>0<>18c2aa5a974683713a3256096aab5d3a<>res://.godot/imported/Skeleton Archer.aseprite-6171fda6a50057e4d9a2e793d4f17261.res::
+Skeleton.aseprite::PackedDataContainer::241853343105005125::1720904567::1756821937::1::::<><><>0<>0<>d3bd8ff61220feb79e74d4f2a6b1541c<>res://.godot/imported/Skeleton.aseprite-a9a4952bee6c8fec6712f747146f9bc8.res::
+Slime.aseprite::PackedDataContainer::7380870966565096951::1720905006::1756821937::1::::<><><>0<>0<>fa9626e65c458e81107b97e77e8eb992<>res://.godot/imported/Slime.aseprite-09684d673805978d2f9cd9050309ea6b.res::
+Soldier.aseprite::PackedDataContainer::8418065444764476403::1720905104::1756821937::1::::<><><>0<>0<>4856d41196568d320cec81faf124da05<>res://.godot/imported/Soldier.aseprite-6d578c46d9df8e4800c619a3b333672e.res::
+Swordsman.aseprite::PackedDataContainer::4154046601084333583::1720899830::1756821937::1::::<><><>0<>0<>88dde5b110cdf12f372cbac74cbd4616<>res://.godot/imported/Swordsman.aseprite-6ff4767e2d1a8a6499732273564a872a.res::
+Werebear.aseprite::PackedDataContainer::7364787169709418634::1720905550::1756821937::1::::<><><>0<>0<>36aac0a5a33e6d13f7a4fb749eadef1d<>res://.godot/imported/Werebear.aseprite-02b120640b87f53c598fcf7a8dee74e0.res::
+Werewolf.aseprite::PackedDataContainer::5499963371581249723::1720900006::1756821937::1::::<><><>0<>0<>011f42741acafbb326f469e250ff157f<>res://.godot/imported/Werewolf.aseprite-fd48de59509e3629237560c1b1647bcd.res::
+Wizard.aseprite::PackedDataContainer::1918242570044816776::1720900326::1756821937::1::::<><><>0<>0<>4220db1f161923c884e0717c64f99d04<>res://.godot/imported/Wizard.aseprite-4788447df215d92485a4f8f440ecbd3a.res::
 ::res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/::1756750810
 ::res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/::1756750809
 ::res://Sprites/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/::1756750816
