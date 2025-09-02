@@ -12,7 +12,6 @@
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 
-
 using namespace godot;
 
 class Character : public CharacterBody2D {
@@ -49,7 +48,7 @@ public:
     Ref<StateMachine> get_state_machine();
     
     // Animation methods
-    void set_animation(String p_anim_name);
+    void set_animation(const String& p_anim_name);
     String get_look_direction() const;
 
 private:
@@ -63,7 +62,6 @@ public:
     //  Life cycle methods
     virtual void _ready() override;
     virtual void _physics_process(double p_delta) override;
-    virtual void _process(double p_delta) override;
     void _notification(int what);
     virtual PackedStringArray _get_configuration_warnings() const override;
 

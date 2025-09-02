@@ -1,8 +1,8 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1756758357
+::res://::1756818979
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1756657957::1756658490::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1756657957::1756658490::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-node_2d.tscn::PackedScene::3230838035535760141::1756757898::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
+node_2d.tscn::PackedScene/PackedScene::3230838035535760141::1756818706::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
 player.tscn::PackedScene/PackedScene::8664568732048542506::1756657957::0::1::::<><><>0<>0<><>::res://data/test.json
 ::res://addons/::1756657957
 ::res://addons/AsepriteWizard/::1756657957
@@ -111,8 +111,8 @@ resource_tree.gd::GDScript/GDScript::2493549475117036037::1756657957::0::1::::<>
 resource_tree.tscn::PackedScene/PackedScene::5371907658088870246::1756657957::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/resource_tree.gd<>res://addons/AsepriteWizard/interface/imports_manager/tree_filter_field.gd
 tree_selection_confirmation_warning.gd::GDScript/GDScript::2235654121850509422::1756657957::0::1::::<>VBoxContainer<><>0<>1<><>::
 tree_selection_confirmation_warning.tscn::PackedScene/PackedScene::1136156742705764826::1756657957::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/tree_selection_confirmation_warning.gd
-::res://bin/::1756758354
-arpg.gdextension::GDExtension/GDExtension::4350973611250297962::1756657957::0::1::::<><><>0<>0<><>::
+::res://bin/::1756818976
+arpg.gdextension::GDExtension/GDExtension::4350973611250297962::1756818923::0::1::::<><><>0<>0<><>::
 ::res://data/::1756657957
 test.json::JSON/JSON::-1::1756657957::0::1::::<><><>0<>0<><>::
 ::res://data/fonts/::1756658490
@@ -120,9 +120,10 @@ dogica.ttf::FontFile/FontFile::3512467822267752933::1756657957::1756658489::1:::
 dogicabold.ttf::FontFile/FontFile::8690599302228161366::1756657957::1756658489::1::::<><><>0<>0<>c06e66047ee4bca95fc982d67ae7aeee<>res://.godot/imported/dogicabold.ttf-a0a5e87bced7d5d0815d36fd46d89b15.fontdata::
 dogicapixel.ttf::FontFile/FontFile::8815712230196811931::1756657957::1756658489::1::::<><><>0<>0<>43b70dd828aa47ec28bedc033a76beaa<>res://.godot/imported/dogicapixel.ttf-31386ef048fdd8302df2a55bd57e206b.fontdata::
 dogicapixelbold.ttf::FontFile/FontFile::4484800723925184585::1756657957::1756658489::1::::<><><>0<>0<>6a825bbf947e25d4565561eda17ef715<>res://.godot/imported/dogicapixelbold.ttf-111485891e6629999c968eac7463266f.fontdata::
-::res://scripts/::1756751122
-player_controller.gd::GDScript/GDScript::2106917852339585366::1756743970::0::1::::PlayerController<>Character<><>0<>0<><>::
-player_idle_state.gd::GDScript/GDScript::2680882094229451658::1756751122::0::1::::PlayerIdleState<>State<><>0<>0<><>::
+::res://scripts/::1756811859
+PlayerRunState.gd::GDScript/GDScript::3587217611777768958::1756808565::0::1::::PlayerRunState<>State<><>0<>0<><>::
+player_controller.gd::GDScript/GDScript::2106917852339585366::1756811859::0::1::::PlayerController<>Character<><>0<>0<><>::
+player_idle_state.gd::GDScript/GDScript::2680882094229451658::1756808565::0::1::::PlayerIdleState<>State<><>0<>0<><>::
 ::res://Sprites/::1756750809
 ::res://Sprites/Cute_Fantasy/::1756750808
 read_me.txt::TextFile/TextFile::-1::1746106075::0::1::::<><><>0<>0<><>::

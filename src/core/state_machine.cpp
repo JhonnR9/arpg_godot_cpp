@@ -10,62 +10,81 @@
 #include "godot_cpp/variant/variant.hpp"
 #include "state.h"
 
+#define DEBUG_STATE_MACHINE  0
+
+#if DEBUG_STATE_MACHINE
+    #define STATE_MACHINE_LOG(...) UtilityFunctions::print("StateMachine-> " ,__VA_ARGS__)
+    #define STATE_MACHINE_ERR(...) UtilityFunctions::printerr(__VA_ARGS__)
+#else
+    #define STATE_MACHINE_LOG(...) ((void)0)
+    #define STATE_MACHINE_ERR(...) ((void)0)
+#endif
+
+
+
 void StateMachine::add_state(String p_name, Ref<State> p_new_state) {
     if (p_name.is_empty()) {
-        UtilityFunctions::printerr("Cannot add state with empty name.");
+        STATE_MACHINE_ERR("Cannot add state with empty name.");
         return;
     }
     if (p_new_state.is_null()) {
-        UtilityFunctions::printerr("Cannot add null state for name: ", p_name);
+        STATE_MACHINE_ERR("Cannot add null state for name: ", p_name);
         return;
     }
     if (!p_new_state->is_class("State")) {
-        UtilityFunctions::printerr("Object for state ", p_name, " is not a State class.");
+        STATE_MACHINE_ERR("Object for state ", p_name, " is not a State class.");
         return;
     }
     if (!states.has(p_name)) {
         states[p_name] = p_new_state;
-        UtilityFunctions::print("Added state: ", p_name);
+        STATE_MACHINE_LOG("Added state: ", p_name);
     } else {
-        UtilityFunctions::printerr("State already exists: ", p_name);
+        STATE_MACHINE_ERR("State already exists: ", p_name);
     }
 }
 
 void StateMachine::set_state(String p_name) {
     if (p_name.is_empty()) {
-        UtilityFunctions::printerr("Cannot set empty state name.");
+        STATE_MACHINE_ERR("Cannot set empty state name.");
         return;
     }
     if (!states.has(p_name)) {
-        UtilityFunctions::printerr("State not found: ", p_name);
+        STATE_MACHINE_ERR("State not found: ", p_name);
         return;
     }
-    if (!next.is_empty() && next == p_name) {
-        UtilityFunctions::print("State ", p_name, " already queued, ignoring.");
+    if (p_name == current){
+          STATE_MACHINE_LOG("State ", p_name, " already running, ignoring.");
+          return;
+    }
+    if (!next.is_empty() && next == p_name ) {
+        STATE_MACHINE_LOG("State ", p_name, " already queued, ignoring.");
         return;
     }
+
     if (current.is_empty()) {
         Ref<State> state = states[p_name];
         if (state.is_valid() && character != nullptr) {
-            UtilityFunctions::print("Directly entering state: ", p_name);
+            STATE_MACHINE_LOG("Directly entering state: ", p_name);
             current = p_name;
             state->_gdvirtual__on_state_enter_call(character);
         } else {
-            UtilityFunctions::printerr("Cannot enter state ", p_name, ": invalid state or null character.");
+            STATE_MACHINE_ERR("Cannot enter state ", p_name, ": invalid state or null character.");
         }
         return;
     }
-    UtilityFunctions::print("Queueing transition to state: ", p_name);
+    STATE_MACHINE_LOG("Queueing transition to state: ", p_name);
+
     next = p_name; // Queue state transition for update
 }
 
+
 void StateMachine::remove_state(String p_name) {
     if (p_name.is_empty()) {
-        UtilityFunctions::printerr("Cannot remove state with empty name.");
+        STATE_MACHINE_ERR("Cannot remove state with empty name.");
         return;
     }
     if (states.has(p_name)) {
-        UtilityFunctions::print("Removing state: ", p_name);
+        STATE_MACHINE_LOG("Removing state: ", p_name);
         if (current == p_name) {
             current = ""; // Clear current state if removing it
         }
@@ -74,7 +93,7 @@ void StateMachine::remove_state(String p_name) {
         }
         states.erase(p_name);
     } else {
-        UtilityFunctions::printerr("Cannot remove state, not found: ", p_name);
+        STATE_MACHINE_ERR("Cannot remove state, not found: ", p_name);
     }
 }
 
@@ -89,26 +108,26 @@ uint16_t StateMachine::get_states_count() const {
 void StateMachine::update(float p_delta) {
     // Handle state transition
     if (!next.is_empty() && states.has(next)) {
-        UtilityFunctions::print("Processing transition to state: ", next);
+        STATE_MACHINE_LOG("Processing transition to state: ", next);
         // Exit current state
         if (!current.is_empty() && states.has(current)) {
             Ref<State> current_state = states[current];
             if (current_state.is_valid()) {
-                UtilityFunctions::print("Exiting state: ", current);
+                STATE_MACHINE_LOG("Exiting state: ", current);
                 current_state->_gdvirtual__on_state_exit_call();
             } else {
-                UtilityFunctions::printerr("Invalid current state object: ", current);
+                STATE_MACHINE_ERR("Invalid current state object: ", current);
             }
         }
 
         // Enter next state
         Ref<State> next_state = states[next];
         if (next_state.is_valid() && character != nullptr) {
-            UtilityFunctions::print("Entering state: ", next);
+            STATE_MACHINE_LOG("Entering state: ", next);
             current = next;
             next_state->_gdvirtual__on_state_enter_call(character);
         } else {
-            UtilityFunctions::printerr("Cannot enter state ", next, ": invalid state or null character.");
+            STATE_MACHINE_ERR("Cannot enter state ", next, ": invalid state or null character.");
         }
         next = "";
     }
@@ -119,14 +138,14 @@ void StateMachine::update(float p_delta) {
         if (current_state.is_valid() && character != nullptr) {
             current_state->_gdvirtual__on_state_stay_call(p_delta);
         } else {
-            UtilityFunctions::printerr("Cannot update state ", current, ": invalid state or null character.");
+            STATE_MACHINE_ERR("Cannot update state ", current, ": invalid state or null character.");
             current = ""; // Reset to avoid repeated errors
         }
     }
 }
 
 StateMachine::StateMachine() : character(nullptr) {
-    UtilityFunctions::print("StateMachine initialized.");
+    STATE_MACHINE_LOG("StateMachine initialized.");
 }
 
 void StateMachine::_bind_methods() {
@@ -141,5 +160,6 @@ void StateMachine::_bind_methods() {
 
 void StateMachine::set_character(Character* p_character) {
     this->character = p_character;
-    UtilityFunctions::print("Character set for StateMachine: ", p_character ? p_character->get_class() : "null");
+    this->character = p_character;
+    STATE_MACHINE_LOG("Character set for StateMachine: ", p_character ? p_character->get_class() : "null");
 }
