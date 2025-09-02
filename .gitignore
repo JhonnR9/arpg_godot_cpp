@@ -385,8 +385,9 @@ ehthumbs_vista.db
 $RECYCLE.BIN/
 *.cab
 *.msi
-*.msix
+*.msixs
 *.msm
 *.msp
 *.lnk
 *.generated.propss
+godot-cpp/

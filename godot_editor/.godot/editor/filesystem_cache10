@@ -1,8 +1,8 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1756818979
+::res://::1756821574
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1756657957::1756658490::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1756657957::1756658490::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-node_2d.tscn::PackedScene/PackedScene::3230838035535760141::1756818706::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
+node_2d.tscn::PackedScene::3230838035535760141::1756819081::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
 player.tscn::PackedScene/PackedScene::8664568732048542506::1756657957::0::1::::<><><>0<>0<><>::res://data/test.json
 ::res://addons/::1756657957
 ::res://addons/AsepriteWizard/::1756657957
@@ -111,7 +111,7 @@ resource_tree.gd::GDScript/GDScript::2493549475117036037::1756657957::0::1::::<>
 resource_tree.tscn::PackedScene/PackedScene::5371907658088870246::1756657957::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/resource_tree.gd<>res://addons/AsepriteWizard/interface/imports_manager/tree_filter_field.gd
 tree_selection_confirmation_warning.gd::GDScript/GDScript::2235654121850509422::1756657957::0::1::::<>VBoxContainer<><>0<>1<><>::
 tree_selection_confirmation_warning.tscn::PackedScene/PackedScene::1136156742705764826::1756657957::0::1::::<><><>0<>0<><>::res://addons/AsepriteWizard/interface/shared/tree/tree_selection_confirmation_warning.gd
-::res://bin/::1756818976
+::res://bin/::1756821568
 arpg.gdextension::GDExtension/GDExtension::4350973611250297962::1756818923::0::1::::<><><>0<>0<><>::
 ::res://data/::1756657957
 test.json::JSON/JSON::-1::1756657957::0::1::::<><><>0<>0<><>::
