@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3 uid="uid://buwb5u7ihpih0"]
+
+[ext_resource type="Theme" uid="uid://ckhtk6cytdgee" path="res://menu_theme.tres" id="1_wk5wi"]
+
+[node name="CharacterSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_wk5wi")
+
+[node name="Button" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 20.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Next"
+
+[node name="RichTextLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -55.0
+offset_top = 9.0
+offset_right = 56.0
+offset_bottom = 25.0
+grow_horizontal = 2
+text = "Character Selector"

@@ -1,12 +1,12 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1756905730
+::res://::1756915099
 char22.png::CompressedTexture2D/CompressedTexture2D::1357422436405149426::1756657957::1756658490::1::::<><><>0<>0<>1a38bffd302b0429378f5009d88a1972<>res://.godot/imported/char22.png-779bbf863f4a54d04682be09b896bba9.ctex::
-character_selector.tscn::PackedScene::3835729258127158159::1756905713::0::1::::<><><>0<>0<><>::uid://ckhtk6cytdgee::::res://menu_theme.tres
+character_selector.tscn::PackedScene/PackedScene::3835729258127158159::1756907755::0::1::::<><><>0<>0<><>::uid://ckhtk6cytdgee::::res://menu_theme.tres
 icon.svg::CompressedTexture2D/CompressedTexture2D::2096827085679445286::1756657957::1756658490::1::::<><><>0<>0<>9d7a2409fe29f1d8ce94bdb6e2665dff<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-menu_theme.tres::Theme::5490353561275985004::1756904888::0::1::::<><><>0<>0<><>::uid://by4lfxoyhi8am::::res://runescape_uf.ttf
-node_2d.tscn::PackedScene::3230838035535760141::1756905713::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
+menu_theme.tres::Theme/Theme::5490353561275985004::1756905733::0::1::::<><><>0<>0<><>::uid://by4lfxoyhi8am::::res://runescape_uf.ttf
+node_2d.tscn::PackedScene/PackedScene::3230838035535760141::1756907755::0::1::::<><><>0<>0<><>::uid://5auvnmhjabvy::::res://scripts/player_controller.gd<>uid://tlssw48lru1w::::res://char22.png<>uid://bqbp3jvhqtrdd::::res://data/fonts/dogica.ttf<>uid://dxunq0i3381v8::::res://data/fonts/dogicapixel.ttf<>uid://dv215vk4edbkg::::res://data/fonts/dogicabold.ttf
 runescape_uf.ttf::FontFile/FontFile::4131497932528039616::1269974370::1756849756::1::::<><><>0<>0<>2b151c7f9e2872903efec4fb2bac93bc<>res://.godot/imported/runescape_uf.ttf-846a324230325ab662fb38e655e4e11d.fontdata::
-::res://bin/::1756905726
+::res://bin/::1756915095
 arpg.gdextension::GDExtension/GDExtension::4350973611250297962::1756818923::0::1::::<><><>0<>0<><>::
 ::res://data/::1756657957
 test.json::JSON/JSON::-1::1756657957::0::1::::<><><>0<>0<><>::
