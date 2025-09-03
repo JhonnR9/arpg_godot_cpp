@@ -21,13 +21,6 @@
 #include "godot_cpp/variant/vector3.hpp"
 
 // -----------------------------------------
-// Constants
-// -----------------------------------------
-namespace {
-const char *DEFAULT_DISPLAY_NAME = "No name";
-} // namespace
-
-// -----------------------------------------
 // Constructor & Initialization
 // -----------------------------------------
 Character::Character() {
@@ -41,13 +34,14 @@ Character::Character() {
 	max_move_speed = 100.0f;
 	acceleration = 0.2f;
 	friction = 0.2f;
-	display_name = DEFAULT_DISPLAY_NAME;
+	display_name = "No name";
 	move_direction = Vector2(0.0f, 0.0f);
+	has_animation_in_child = false;
+
+	connect_animation_in_child();
 }
 Character::~Character() {
-	if (animation_player) {
-		animation_player->disconnect("tree_exiting", callable_mp(this, &Character::_on_animation_node_tree_exit));
-	}
+	disconnect_animation_in_child();
 }
 // -----------------------------------------
 // Command Handling
@@ -115,33 +109,42 @@ void Character::update_animation() {
 		}
 	}
 }
-
-bool Character::update_animation_nodes() {
-	if (animation_player) {
-		return true;
+void Character::_on_child_node_tree_exit(Node *p_node) {
+	if (AnimationPlayer *node = cast_to<AnimationPlayer>(p_node)) {
+		if (node == animation_player) {
+			animation_player = nullptr;
+		}
 	}
-	auto last_child = get_child(get_child_count() - 1);
-
-	if (auto *anin_player = Object::cast_to<AnimationPlayer>(last_child)) {
-		animation_player = anin_player;
-		animation_player->connect("tree_exiting", callable_mp(this, &Character::_on_animation_node_tree_exit));
-
-		return true;
-	}
-
-	return false;
 }
+void Character::_on_child_node_tree_entered(Node *p_node) {
+	if (animation_player) {
+		return;
+	}
+	if (AnimationPlayer *node = cast_to<AnimationPlayer>(p_node)) {
+		animation_player = node;
+	}
+}
+void Character::connect_animation_in_child() {
+	if (!this->is_connected("child_entered_tree", callable_mp(this, &Character::_on_child_node_tree_entered)) && !this->is_connected("child_exiting_tree", callable_mp(this, &Character::_on_child_node_tree_exit))) {
+		this->connect("child_entered_tree", callable_mp(this, &Character::_on_child_node_tree_entered));
+		this->connect("child_exiting_tree", callable_mp(this, &Character::_on_child_node_tree_exit));
+	}
 
-void Character::_on_animation_node_tree_exit() {
-	animation_player = nullptr;
+}
+void Character::disconnect_animation_in_child() {
+	if (this->is_connected("child_entered_tree", callable_mp(this, &Character::_on_child_node_tree_entered)) && this->is_connected("child_exiting_tree", callable_mp(this, &Character::_on_child_node_tree_exit))) {
+		this->disconnect("child_entered_tree", callable_mp(this, &Character::_on_child_node_tree_entered));
+		this->disconnect("child_exiting_tree", callable_mp(this, &Character::_on_child_node_tree_exit));
+		animation_player = nullptr;
+	}
 }
 
 // -----------------------------------------
 // Movement Handling
 // -----------------------------------------
 void Character::set_movement(Vector2 p_direction) {
-	Vector2 current_velocity = get_velocity();
-	Vector2 target_velocity = p_direction.normalized() * max_move_speed;
+	const Vector2 current_velocity = get_velocity();
+	const Vector2 target_velocity = p_direction.normalized() * max_move_speed;
 
 	Vector2 new_velocity;
 	new_velocity.x = Math::lerp(current_velocity.x, target_velocity.x, acceleration);
@@ -153,11 +156,10 @@ void Character::set_movement(Vector2 p_direction) {
 void Character::apply_movement() {
 	if (move_and_slide()) {
 		for (int i = 0; i < get_slide_collision_count(); i++) {
-			Ref<KinematicCollision2D> collision = get_slide_collision(i);
+			const Ref<KinematicCollision2D> collision = get_slide_collision(i);
 			Vector2 normal = collision->get_normal();
-			Vector2 velocity = get_velocity();
 
-			if (velocity.dot(normal) > 0) {
+			if (Vector2 velocity = get_velocity(); velocity.dot(normal) > 0) {
 				velocity = velocity.slide(normal);
 				set_velocity(velocity);
 			}
@@ -179,7 +181,7 @@ void Character::apply_friction() {
 
 void Character::update_look_direction() {
 	if (get_velocity().length_squared() > 0.01f) {
-		Vector2 velocity = get_velocity();
+		const Vector2 velocity = get_velocity();
 		look_direction =
 				(Math::abs(velocity.x) > Math::abs(velocity.y)) ? (velocity.x > 0.0f ? RIGHT : LEFT) : (velocity.y > 0.0f ? DOWN : UP);
 	}
@@ -219,16 +221,18 @@ void Character::_physics_process(double_t p_delta) {
 		apply_movement();
 	}
 }
-void Character::_notification(int what) {
-	switch (what) {
+void Character::_notification(int p_what) {
+	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			state_machine = Ref(memnew(StateMachine));
 			state_machine->set_character(this);
+
+			connect_animation_in_child();
 			break;
 		}
 
-		case NOTIFICATION_CHILD_ORDER_CHANGED:
-			has_animation_node = update_animation_nodes();
+		case NOTIFICATION_EXIT_TREE:
+			disconnect_animation_in_child();
 			break;
 
 		case NOTIFICATION_PROCESS: {
@@ -265,11 +269,12 @@ PackedStringArray Character::_get_configuration_warnings() const {
 	PackedStringArray warnings = CharacterBody2D::_get_configuration_warnings();
 
 	if (!animation_player) {
-		warnings.append("This node requires an AnimationPlayer as a child node for animations to work "
-						"correctly.\n"
-						"Without it, animation playback will not function, and related features such as "
-						"state-driven animations will be disabled.\n"
-						"Please add an AnimationPlayer node as a child of this Character.");
+		warnings.append(
+				"This node requires an AnimationPlayer as a child node for animations to work "
+				"correctly.\n"
+				"Without it, animation playback will not function, and related features such as "
+				"state-driven animations will be disabled.\n"
+				"Please add an AnimationPlayer node as a child of this Character.");
 	}
 
 	return warnings;
@@ -281,31 +286,33 @@ PackedStringArray Character::_get_configuration_warnings() const {
 void Character::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_life"), &Character::get_life);
 	ClassDB::bind_method(D_METHOD("set_life", "p_life"), &Character::set_life);
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "life"), "set_life", "get_life");
 
 	ClassDB::bind_method(D_METHOD("get_acceleration"), &Character::get_acceleration);
 	ClassDB::bind_method(D_METHOD("set_acceleration", "p_acceleration"), &Character::set_acceleration);
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_acceleration", "get_acceleration");
 
 	ClassDB::bind_method(D_METHOD("get_friction"), &Character::get_friction);
 	ClassDB::bind_method(D_METHOD("set_friction", "p_friction"), &Character::set_friction);
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_friction", "get_friction");
 
 	ClassDB::bind_method(D_METHOD("get_max_move_speed"), &Character::get_max_move_speed);
 	ClassDB::bind_method(D_METHOD("set_max_move_speed", "p_max_move_speed"), &Character::set_max_move_speed);
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed", "get_max_move_speed");
 
 	ClassDB::bind_method(D_METHOD("get_move_direction"), &Character::get_move_direction);
 	ClassDB::bind_method(D_METHOD("set_move_direction", "p_max_move_speed"), &Character::set_move_direction);
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "move_direction"), "set_move_direction", "get_move_direction");
 
 	ClassDB::bind_method(D_METHOD("get_display_name"), &Character::get_display_name);
 	ClassDB::bind_method(D_METHOD("set_display_name", "p_display_name"), &Character::set_display_name);
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name", "get_display_name");
 
 	ClassDB::bind_method(D_METHOD("get_state_machine"), &Character::get_state_machine);
 	ClassDB::bind_method(D_METHOD("set_animation", "p_animation_name"), &Character::set_animation);
-	ClassDB::bind_method(D_METHOD("add_command", "p_command"), &Character::enqueue_command);
+
+	ClassDB::bind_method(D_METHOD("add_enqueue", "p_command"), &Character::enqueue_command);
+
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "life"), "set_life", "get_life");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_acceleration", "get_acceleration");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_friction", "get_friction");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_move_speed"), "set_max_move_speed", "get_max_move_speed");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "move_direction"), "set_move_direction", "get_move_direction");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name", "get_display_name");
 }
 
 // -----------------------------------------

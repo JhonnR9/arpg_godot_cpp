@@ -5,7 +5,7 @@
 
 using namespace godot;
 
-class ARPG : public Node2D {
+class ARPG final : public Node2D {
     GDCLASS(ARPG, Node2D);
 
 protected:
