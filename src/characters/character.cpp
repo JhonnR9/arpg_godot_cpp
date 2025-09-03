@@ -19,6 +19,9 @@
 #include "godot_cpp/variant/variant.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include "godot_cpp/variant/vector3.hpp"
+#include "tools/auto_resgister.h"
+
+AUTO_REGISTER_CLASS(Character)
 
 // -----------------------------------------
 // Constructor & Initialization

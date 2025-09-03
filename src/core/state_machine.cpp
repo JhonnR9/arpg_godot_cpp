@@ -9,6 +9,7 @@
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 #include "state.h"
+#include "tools/auto_resgister.h"
 
 #define DEBUG_STATE_MACHINE  0
 
@@ -20,7 +21,7 @@
     #define STATE_MACHINE_ERR(...) ((void)0)
 #endif
 
-
+AUTO_REGISTER_CLASS(StateMachine)
 
 void StateMachine::add_state(String p_name, Ref<State> p_new_state) {
     if (p_name.is_empty()) {

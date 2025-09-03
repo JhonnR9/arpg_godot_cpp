@@ -1,5 +1,8 @@
 #include "arpg.h"
 #include "godot_cpp/variant/string.hpp"
+#include "tools/auto_resgister.h"
+
+AUTO_REGISTER_RUNTIME_CLASS(ARPG)
 
 ARPG::ARPG() {
 

@@ -8,6 +8,8 @@
 #include "godot_cpp/classes/ref.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include "godot_cpp/variant/vector2.hpp"
+#include "tools/auto_resgister.h"
+
 #include <cstddef>
 #include <godot_cpp/classes/weak_ref.hpp>
 
@@ -15,7 +17,6 @@ using namespace godot;
 
 class Character : public CharacterBody2D {
 	GDCLASS(Character, CharacterBody2D);
-
 private:
 	// Character attributes
 	String display_name;

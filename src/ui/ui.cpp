@@ -4,7 +4,9 @@
 #include "godot_cpp/classes/scene_tree.hpp"
 
 #include "godot_cpp/variant/callable.hpp"
+#include "tools/auto_resgister.h"
 
+AUTO_REGISTER_RUNTIME_CLASS(UI)
 
 UI::UI(){
     
