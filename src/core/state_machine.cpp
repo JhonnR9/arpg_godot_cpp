@@ -161,6 +161,5 @@ void StateMachine::_bind_methods() {
 
 void StateMachine::set_character(Character* p_character) {
     this->character = p_character;
-    this->character = p_character;
     STATE_MACHINE_LOG("Character set for StateMachine: ", p_character ? p_character->get_class() : "null");
 }

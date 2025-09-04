@@ -13,7 +13,7 @@ config_version=5
 config/name="ARPG"
 run/main_scene="uid://bmbbovs8vnafl"
 config/features=PackedStringArray("4.4", "Mobile")
-config/icon="res://icon.svg"
+config/icon="res://Sprites/icon.svg"
 
 [display]
 
@@ -27,10 +27,6 @@ window/size/window_width_override=800
 window/size/window_height_override=450
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-
-[gui]
-
-theme/custom="uid://ckhtk6cytdgee"
 
 [input]
 

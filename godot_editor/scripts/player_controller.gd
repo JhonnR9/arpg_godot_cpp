@@ -1,3 +1,4 @@
+
 class_name PlayerController extends Character
 @onready var machine := get_state_machine()
 func _ready() -> void:
@@ -6,11 +7,11 @@ func _ready() -> void:
 	machine.set_state("idle")
 	set_process(true)
 	
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var direction = Input.get_vector("left", "right", "up", "down")
-	move_direction = direction;
+	set_move_direction(direction)
 	
-	if move_direction.length_squared() > 0.01 :
+	if get_move_direction().length_squared() > 0.01 :
 		machine.set_state("run")	
 	else:
 		machine.set_state("idle")

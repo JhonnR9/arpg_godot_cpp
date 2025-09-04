@@ -1,12 +1,5 @@
 #include "register_types.h"
-#include "arpg.h"
-#include "characters/character.h"
-#include "core/command.h"
-#include "core/state.h"
-#include "core/state_machine.h"
 #include "tools/class_registry.h"
-#include "tools/json_parse.h"
-#include "ui/ui.h"
 #include <godot_cpp/core/class_db.hpp>
 
 void initialize_arpg_module(ModuleInitializationLevel p_level) {
@@ -15,7 +8,6 @@ void initialize_arpg_module(ModuleInitializationLevel p_level) {
 	}
 
 	ClassRegistry::get().execute_all();
-
 
 }
 
