@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://62m7ontlk22g"]
+
+[ext_resource type="Script" uid="uid://dixb2ts7vvv8u" path="res://movable_actor_2d.gd" id="1_wtcfe"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y32ns"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="MovableActor2D" type="MovableActor2D" parent="."]
+position = Vector2(124, 71)
+script = ExtResource("1_wtcfe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovableActor2D"]
+shape = SubResource("RectangleShape2D_y32ns")
+
+[node name="MovableActor2D2" type="MovableActor2D" parent="."]
+modulate = Color(0.969333, 0.08, 1, 1)
+position = Vector2(63, 48)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovableActor2D2"]
+shape = SubResource("RectangleShape2D_y32ns")
