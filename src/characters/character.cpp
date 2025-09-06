@@ -107,7 +107,6 @@ void Character::set_animation(const String &p_anim_name) {
 		}
 	}
 
-
 	// Check if the AnimatedSprite2D has the requested animation
 	if (animated_sprite) {
 		Ref<SpriteFrames> sprite_frames = animated_sprite->get_sprite_frames();
@@ -239,7 +238,6 @@ void Character::_notification(int p_what) {
 			state_machine->set_character(this);
 			break;
 		}
-
 		case NOTIFICATION_CHILD_ORDER_CHANGED: {
 			const int index = get_child_count() - 1;
 			if (index < 0) {

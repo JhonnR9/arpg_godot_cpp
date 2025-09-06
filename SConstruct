@@ -12,6 +12,7 @@ env.Append(CPPPATH=[
 
 # Coleta os arquivos-fonte usando Glob para melhor precisão
 sources = []
+
 sources.extend(Glob("src/*.cpp"))
 sources.extend(Glob("src/core/*.cpp"))
 sources.extend(Glob("src/characters/*.cpp"))

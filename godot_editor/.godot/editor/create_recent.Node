@@ -1,3 +1,6 @@
+CollisionShape2D
+MovableActor2D
+CharacterBody2D
 AnimatedSprite2D
 Character
 AnimationPlayer
@@ -9,6 +12,3 @@ MarginContainer
 ItemList
 GridContainer
 Button
-CanvasLayer
-Label
-RichTextLabel
