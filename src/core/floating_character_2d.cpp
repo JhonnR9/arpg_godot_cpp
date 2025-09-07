@@ -117,6 +117,11 @@ void FloatingCharacter2D::_apply_motion_and_slide() {
 }
 void FloatingCharacter2D::_calculate_move_dir_name() {
 	const Vector2 velocity = get_velocity();
+
+	if (velocity.length_squared() < 0.01f) {
+		return;
+	}
+
 	const Direction move_cache = move_direction_name;
 	// For four directions (Up, Down, Left, Right) this is more fast for performance
 	if (move_direction_mode == FOUR_BASED) {

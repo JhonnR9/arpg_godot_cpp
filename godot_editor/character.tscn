@@ -1,14 +1,7 @@
-[gd_scene load_steps=20 format=3 uid="uid://bmbbovs8vnafl"]
+[gd_scene load_steps=14 format=3 uid="uid://mqbu4mroiim4"]
 
-[ext_resource type="Script" uid="uid://cbqxmfinjwffg" path="res://scripts/animation_controller.gd" id="2_fws66"]
-[ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://Sprites/char22.png" id="2_j7wrs"]
-[ext_resource type="FontFile" uid="uid://bqbp3jvhqtrdd" path="res://data/fonts/dogica.ttf" id="3_fws66"]
-[ext_resource type="FontFile" uid="uid://dxunq0i3381v8" path="res://data/fonts/dogicapixel.ttf" id="4_hh0fu"]
-[ext_resource type="FontFile" uid="uid://dv215vk4edbkg" path="res://data/fonts/dogicabold.ttf" id="5_3m5ht"]
-[ext_resource type="Script" uid="uid://dib20myjjyuau" path="res://scripts/floating_character_2d.gd" id="6_j7wrs"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_epypp"]
-size = Vector2(8, 4)
+[ext_resource type="Script" uid="uid://5auvnmhjabvy" path="res://scripts/player_controller.gd" id="1_pjt0s"]
+[ext_resource type="Texture2D" uid="uid://tlssw48lru1w" path="res://Sprites/char22.png" id="2_wa5vi"]
 
 [sub_resource type="Animation" id="Animation_0hol4"]
 length = 0.001
@@ -173,93 +166,24 @@ _data = {
 &"run_up": SubResource("Animation_hqns4")
 }
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q6r6c"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 1)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_epypp"]
+size = Vector2(8, 4)
 
-[sub_resource type="CanvasTexture" id="CanvasTexture_q6r6c"]
+[node name="Character" type="Character"]
+script = ExtResource("1_pjt0s")
 
-[node name="ARPG" type="Node2D"]
-y_sort_enabled = true
-
-[node name="FloatingCharacter2D" type="FloatingCharacter2D" parent="."]
-position = Vector2(121, 94)
-script = ExtResource("6_j7wrs")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatingCharacter2D"]
-shape = SubResource("RectangleShape2D_epypp")
-
-[node name="AnimationController" type="AnimationController" parent="FloatingCharacter2D"]
-script = ExtResource("2_fws66")
-
-[node name="Sprite2D" type="Sprite2D" parent="FloatingCharacter2D/AnimationController"]
-position = Vector2(0, -12)
-texture = ExtResource("2_j7wrs")
-hframes = 2
-vframes = 24
-frame = 1
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FloatingCharacter2D/AnimationController"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_rj586")
 }
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-visible = false
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_epypp")
 
-[node name="UI" type="Control" parent="CanvasLayer"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="Panel" parent="CanvasLayer/UI"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 26.0
-offset_top = 119.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_q6r6c")
-
-[node name="PanelContainer" type="HBoxContainer" parent="CanvasLayer/UI"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 119.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UI/PanelContainer"]
-custom_minimum_size = Vector2(25.23, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-texture = SubResource("CanvasTexture_q6r6c")
-
-[node name="Label" type="RichTextLabel" parent="CanvasLayer/UI/PanelContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_fonts/normal_font = ExtResource("3_fws66")
-theme_override_fonts/italics_font = ExtResource("4_hh0fu")
-theme_override_fonts/bold_font = ExtResource("5_3m5ht")
-theme_override_font_sizes/bold_italics_font_size = 5
-theme_override_font_sizes/italics_font_size = 5
-theme_override_font_sizes/mono_font_size = 5
-theme_override_font_sizes/normal_font_size = 5
-theme_override_font_sizes/bold_font_size = 5
-text = "dsfsd"
-tab_size = 2
-vertical_alignment = 1
-
-[connection signal="direction_name_changed" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_direction_name_changed"]
-[connection signal="start_move" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_start_move"]
-[connection signal="stop_move" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_stop_move"]
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -12)
+texture = ExtResource("2_wa5vi")
+hframes = 2
+vframes = 24
+frame = 1

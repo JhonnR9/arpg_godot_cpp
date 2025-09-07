@@ -1,7 +1,7 @@
-AnimatedSprite2D
 AnimationController
-AnimationPlayer
 FloatingCharacter2D
+AnimatedSprite2D
+AnimationPlayer
 CollisionShape2D
 CharacterBody2D
 Character
