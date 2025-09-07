@@ -13,7 +13,7 @@ FloatingCharacter2D::FloatingCharacter2D() :
 		emitting_start_move(false),
 		emitting_stop_move(false),
 		move_direction_name(DOWN),
-		move_direction_type(FOUR_BASED) {
+		move_direction_mode(FOUR_BASED) {
 	// use this for top-down games
 	set_motion_mode(MOTION_MODE_FLOATING);
 	set_physics_process(true);
@@ -24,9 +24,10 @@ void FloatingCharacter2D::_notification(int p_what) {
 			if (Engine::get_singleton()->is_editor_hint()) {
 				return;
 			}
-
 			_apply_motion_and_slide();
+			_calculate_move_dir_name();
 			break;
+
 		default:
 			break;
 	}
@@ -52,53 +53,18 @@ void FloatingCharacter2D::set_motion_target_speed(real_t p_motion_target_speed) 
 void FloatingCharacter2D::set_move_direction(const Vector2 p_move_direction) {
 	move_direction = p_move_direction;
 }
-FloatingCharacter2D::Direction FloatingCharacter2D::_get_move_direction_name() const {
-	const real_t angle = fmod(get_velocity().angle(), 360.0f); // Get the angle of the character's velocity vector
+FloatingCharacter2D::Direction FloatingCharacter2D::get_move_direction_name() const {
+	return move_direction_name;
+}
 
-	// Four-direction movement (Up, Down, Left, Right)
-	if (move_direction_type == FOUR_BASED) {
-		// Check if the angle is within the ranges for each direction
-		if (angle >= -45.0f && angle < 45.0f) {
-			return RIGHT; // Right direction (0°)
-		}
-		if (angle >= 45.0f && angle < 135.0f) {
-			return UP; // Up direction (90°)
-		}
-		if (angle >= 135.0f || angle < -135.0f) {
-			return LEFT; // Left direction (180°)
-		}
-		{
-			return DOWN; // Down direction (270°)
-		}
-	}
-	// Eight-direction movement (Up, Down, Left, Right, and diagonals)
-	if (move_direction_type == EIGHT_BASED) {
-		// Check the angle ranges for each direction, including diagonals
-		if (angle >= -22.5f && angle < 22.5f) {
-			return RIGHT; // Right direction (0°)
-		}
-		if (angle >= 22.5f && angle < 67.5f) {
-			return RIGHT_UP; // Upper-right diagonal (45°)
-		}
-		if (angle >= 67.5f && angle < 112.5f) {
-			return UP; // Up direction (90°)
-		}
-		if (angle >= 112.5f && angle < 157.5f) {
-			return LEFT_UP; // Upper-left diagonal (135°)
-		}
-		if (angle >= 157.5f || angle < -157.5f) {
-			return LEFT; // Left direction (180°)
-		}
-		if (angle >= -157.5f && angle < -112.5f) {
-			return LEFT_DOWN; // Lower-left diagonal (225°)
-		}
-		if (angle >= -112.5f && angle < -67.5f) {
-			return DOWN; // Down direction (270°)
-		}
-
-		return RIGHT_DOWN; // Lower-right diagonal (315°)
-	}
-	return DOWN;
+void FloatingCharacter2D::set_move_direction_name(Direction p_move_direction_name) {
+	move_direction_name = p_move_direction_name;
+}
+FloatingCharacter2D::DirectionMode FloatingCharacter2D::get_move_direction_mode() const {
+	return move_direction_mode;
+}
+void FloatingCharacter2D::set_move_direction_mode(DirectionMode p_move_direction_type) {
+	move_direction_mode = p_move_direction_type;
 }
 
 void FloatingCharacter2D::_calculate_acceleration() {
@@ -149,6 +115,30 @@ void FloatingCharacter2D::_apply_motion_and_slide() {
 
 	move_and_slide();
 }
+void FloatingCharacter2D::_calculate_move_dir_name() {
+	const Vector2 velocity = get_velocity();
+	Direction move_cache = move_direction_name;
+	// For four directions (Up, Down, Left, Right) this is more fast for performance
+	if (move_direction_mode == FOUR_BASED) {
+		move_direction_name =
+				(Math::abs(velocity.x) > Math::abs(velocity.y)) ? (velocity.x > 0.0f ? RIGHT : LEFT) : (velocity.y > 0.0f ? DOWN : UP);
+	}
+
+	// For eight directions (Up, Down, Left, Right, and diagonals)
+	const real_t angle = fmod(velocity.angle(), 360.0f); // Get the angle of the character's velocity vector
+
+	if (move_direction_mode == EIGHT_BASED) {
+		static constexpr Direction directions[] = { RIGHT, RIGHT_UP, UP, LEFT_UP, LEFT, LEFT_DOWN, DOWN, RIGHT_DOWN };
+		const real_t normalized_angle = fmod(angle + 22.5f, 360.0f); // Normalize angle for easier mapping
+		const int index = static_cast<int>(normalized_angle / 45.0f) % 8;
+
+		move_direction_name = directions[index];
+	}
+
+	if (move_direction_name != move_cache) {
+		emit_signal("direction_name_changed", move_direction_name);
+	}
+}
 
 void FloatingCharacter2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_friction"), &FloatingCharacter2D::get_friction);
@@ -162,14 +152,19 @@ void FloatingCharacter2D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_move_direction", "p_move_direction"), &FloatingCharacter2D::set_move_direction);
 
-	ClassDB::bind_method(D_METHOD("get_move_direction_name"), &FloatingCharacter2D::_get_move_direction_name);
+	ClassDB::bind_method(D_METHOD("get_move_direction_name"), &FloatingCharacter2D::get_move_direction_name);
+
+	ClassDB::bind_method(D_METHOD("get_move_direction_mode"), &FloatingCharacter2D::get_move_direction_mode);
+	ClassDB::bind_method(D_METHOD("set_move_direction_mode", "p_move_direction_mode"), &FloatingCharacter2D::set_move_direction_mode);
 
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "acceleration", PROPERTY_HINT_RANGE, "0.0,1,0.01"), "set_acceleration", "get_acceleration");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "motion_target_speed"), "set_motion_target_speed", "get_motion_target_speed");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction", PROPERTY_HINT_RANGE, "0.01,1,0.01"), "set_friction", "get_friction");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "move_direction_mode", PROPERTY_HINT_ENUM, "FourBased,EightBased"), "set_move_direction_mode", "get_move_direction_mode");
 
 	ADD_SIGNAL(MethodInfo("start_move"));
 	ADD_SIGNAL(MethodInfo("stop_move"));
+	ADD_SIGNAL(MethodInfo("direction_name_changed", PropertyInfo(Variant::INT, "move_direction_name")));
 
 	BIND_ENUM_CONSTANT(LEFT);
 	BIND_ENUM_CONSTANT(RIGHT);
@@ -179,4 +174,7 @@ void FloatingCharacter2D::_bind_methods() {
 	BIND_ENUM_CONSTANT(LEFT_DOWN);
 	BIND_ENUM_CONSTANT(RIGHT_UP);
 	BIND_ENUM_CONSTANT(RIGHT_DOWN);
+
+	BIND_ENUM_CONSTANT(FOUR_BASED)
+	BIND_ENUM_CONSTANT(EIGHT_BASED)
 }

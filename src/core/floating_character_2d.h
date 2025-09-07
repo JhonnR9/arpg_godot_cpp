@@ -15,9 +15,9 @@ protected:
 public:
 	FloatingCharacter2D();
 
-	enum DirectionType {
-		EIGHT_BASED,
-		FOUR_BASED
+	enum DirectionMode {
+		FOUR_BASED,
+		EIGHT_BASED
 	};
 
 	enum Direction {
@@ -42,7 +42,13 @@ public:
 	real_t get_motion_target_speed() const;
 	void set_motion_target_speed(real_t p_motion_target_speed);
 
-	void set_move_direction(const Vector2 p_move_direction);
+	void set_move_direction(Vector2 p_move_direction);
+
+	Direction get_move_direction_name() const;
+	void set_move_direction_name(Direction p_move_direction_name);
+
+	DirectionMode get_move_direction_mode() const;
+	void set_move_direction_mode(DirectionMode p_move_direction_type);
 
 private:
 	real_t motion_target_speed;
@@ -54,15 +60,15 @@ private:
 	bool emitting_stop_move;
 
 	Direction move_direction_name;
-	DirectionType move_direction_type;
+	DirectionMode move_direction_mode;
 
 	void _calculate_acceleration();
 	void _calculate_friction();
 	void _apply_motion_and_slide();
-	Direction _get_move_direction_name() const;
+	void _calculate_move_dir_name();
 };
 
 VARIANT_ENUM_CAST(FloatingCharacter2D::Direction);
-VARIANT_ENUM_CAST(FloatingCharacter2D::DirectionType);
+VARIANT_ENUM_CAST(FloatingCharacter2D::DirectionMode);
 
 #endif //FLOATING_CHARACTER_2_D_H

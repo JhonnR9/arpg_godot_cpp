@@ -1,5 +1,5 @@
+FloatingCharacter2D
 CollisionShape2D
-MovableActor2D
 CharacterBody2D
 AnimatedSprite2D
 Character
