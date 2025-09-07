@@ -1,9 +1,0 @@
-res://node_2d.tscn
-res://resources/button/button_hover.tres
-res://resources/button/button_normal.tres
-res://resources/button/button_pressed.tres
-res://resources/title_label.tres
-res://resources/menu_theme.tres
-res://scenes/node_2d.tscn
-res://scenes/character_selector.tscn
-res://movable_actor_2d.gd
