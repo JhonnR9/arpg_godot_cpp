@@ -1,9 +1,10 @@
+AnimatedSprite2D
+AnimationController
+AnimationPlayer
 FloatingCharacter2D
 CollisionShape2D
 CharacterBody2D
-AnimatedSprite2D
 Character
-AnimationPlayer
 Panel
 VSplitContainer
 HBoxContainer
@@ -11,4 +12,3 @@ PanelContainer
 MarginContainer
 ItemList
 GridContainer
-Button
