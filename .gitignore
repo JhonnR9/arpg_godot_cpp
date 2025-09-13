@@ -391,3 +391,4 @@ $RECYCLE.BIN/
 *.lnk
 *.generated.propss
 godot-cpp/
+.godot/

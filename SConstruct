@@ -2,24 +2,18 @@
 import os
 import sys
 
-# Importa o ambiente do godot-cpp
 env = SConscript("godot-cpp/SConstruct")
 
-# Adiciona múltiplos diretórios ao caminho de inclusão
 env.Append(CPPPATH=[
-    "src/",
+    "arpg/",
 ])
 
-# Coleta os arquivos-fonte usando Glob para melhor precisão
+
 sources = []
 
-sources.extend(Glob("src/*.cpp"))
-sources.extend(Glob("src/core/*.cpp"))
-sources.extend(Glob("src/characters/*.cpp"))
-sources.extend(Glob("src/characters/player/*.cpp"))
-sources.extend(Glob("src/ui/*.cpp"))
-sources.extend(Glob("src/tools/*.cpp"))
-sources.extend(Glob("src/commands/*.cpp"))
+sources.extend(Glob("arpg/*.cpp"))
+sources.extend(Glob("arpg/core/*.cpp"))
+sources.extend(Glob("arpg/tools/*.cpp"))
 
 
 if env["platform"] == "macos":
@@ -51,5 +45,6 @@ else:
         ),
         source=sources,
     )
+
 
 Default(library)

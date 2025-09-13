@@ -26,7 +26,6 @@ window/size/sharp_corners=true
 window/size/window_width_override=800
 window/size/window_height_override=450
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [input]
 
@@ -72,4 +71,9 @@ iteract={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=3
-environment/defaults/default_clear_color=Color(0.169245, 0.169245, 0.169245, 1)
+textures/lossless_compression/force_png=true
+textures/default_filters/use_nearest_mipmap_filter=true
+textures/default_filters/anisotropic_filtering_level=0
+textures/decals/filter=0
+textures/light_projectors/filter=0
+environment/defaults/default_clear_color=Color(0.176419, 0.176419, 0.176419, 1)
