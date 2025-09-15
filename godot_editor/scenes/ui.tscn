@@ -321,3 +321,11 @@ text = "settings"
 layout_mode = 2
 size_flags_vertical = 4
 text = "quit"
+
+[node name="GridInventory" type="GridInventory" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GridInventory2" type="GridInventory" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0

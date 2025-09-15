@@ -1,6 +1,7 @@
+GridInventory
+TextureRect
 Node2D
 Panel
-TextureRect
 Label
 Control
 BoxContainer
@@ -11,4 +12,3 @@ PanelContainer
 FlowContainer
 Container
 GridContainer
-Button

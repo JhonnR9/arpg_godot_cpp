@@ -1,4 +1,3 @@
-
 #include "floating_character_2d.h"
 #include "godot_cpp/classes/engine.hpp"
 #include "tools/auto_resgister.h"
@@ -105,8 +104,7 @@ void FloatingCharacter2D::_calculate_friction() {
 	set_velocity(new_velocity);
 }
 void FloatingCharacter2D::_apply_motion_and_slide() {
-	constexpr real_t v_threshold_squared = 0.01f;
-	if (move_direction.length_squared() > v_threshold_squared) {
+	if (constexpr real_t v_threshold_squared = 0.01f; move_direction.length_squared() > v_threshold_squared) {
 		_calculate_acceleration();
 
 	} else {
