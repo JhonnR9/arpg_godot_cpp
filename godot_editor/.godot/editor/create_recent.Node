@@ -1,10 +1,10 @@
+BoxContainer
+Control
 GridInventory
 TextureRect
 Node2D
 Panel
 Label
-Control
-BoxContainer
 MarginContainer
 AspectRatioContainer
 HBoxContainer

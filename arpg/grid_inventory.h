@@ -13,23 +13,22 @@ class GridInventory final : public Control {
 
 	int rows = 4;
 	int columns = 8;
-	Size2 slot_size = Vector2(64, 64);
+	Size2 slot_size = Vector2(16, 16);
 	HashMap<Point2i, Rect2> cells;
+	Size2 slot_margin = Vector2(2, 2);
+	Size2 grid_padding = Vector2(4, 4);
 
 	void _draw_bg();
 	void _draw_item_frame();
 	Point2i _get_cell_key(Point2i point) const;
 	void _generate_grid_rects();
 
-
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 
 public:
-	GridInventory() {
-		queue_redraw();
-	};
+	GridInventory() = default;
 
 	Ref<StyleBox> get_bg_style_box() const;
 	void set_bg_style_box(const Ref<StyleBox> &p_bg_style_box);
@@ -46,6 +45,12 @@ public:
 	Size2 get_slot_size() const;
 	void set_slot_size(const Size2 &p_slot_size);
 
-	void _on_changed_style_box();
+	Size2 get_slot_margin() const;
+	void set_slot_margin(const Size2 &p_slot_margin);
 
+	Size2 get_grid_padding() const;
+	void set_grid_padding(const Size2 &p_grid_padding);
+
+	void _on_changed_style_box();
+	Size2 _get_minimum_size() const override;
 };

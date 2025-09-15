@@ -1,13 +1,14 @@
 [gd_scene load_steps=3 format=3 uid="uid://g5r1otrefvmf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
-bg_color = Color(0, 0, 0, 1)
+bg_color = Color(0.2829, 0.35916, 0.41, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
+bg_color = Color(0.595375, 0.48926, 0.515249, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -20,16 +21,23 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
 
-[node name="GridInventory2" type="GridInventory" parent="."]
-bg_style_box = SubResource("StyleBoxFlat_ei5da")
-item_frame_style_box = SubResource("StyleBoxFlat_0anj3")
-rows = 2
-columns = 3
-slot_size = Vector2(16, 16)
+[node name="BoxContainer" type="BoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
+
+[node name="GridInventory2" type="GridInventory" parent="BoxContainer"]
+bg_style_box = SubResource("StyleBoxFlat_ei5da")
+item_frame_style_box = SubResource("StyleBoxFlat_0anj3")
+rows = 3
+columns = 6
+slot_margin = Vector2(4, 4)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
