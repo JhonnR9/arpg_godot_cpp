@@ -25,4 +25,6 @@ public:
 
 	Ref<StyleBox> get_item_frame_style_box() const;
 	void set_item_frame_style_box(const Ref<StyleBox> &p_item_frame_style_box);
+
+	void _changed_bg_style_box();
 };
