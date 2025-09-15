@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://g5r1otrefvmf"]
+
+[ext_resource type="Texture2D" uid="uid://cwm2lkn5gfklo" path="res://Sprites/Cute_Fantasy_UI/UI_ALL.png" id="1_0anj3"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f542o"]
+atlas = ExtResource("1_0anj3")
+region = Rect2(775, 359, 34, 34)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2tpct"]
+texture = SubResource("AtlasTexture_f542o")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+region_rect = Rect2(0, 0, 34, 34)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridInventory2" type="GridInventory" parent="."]
+bg_style_box = SubResource("StyleBoxTexture_2tpct")
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 99.0
+offset_top = -11.0
+offset_right = -81.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
