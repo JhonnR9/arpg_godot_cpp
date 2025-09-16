@@ -65,4 +65,6 @@ public:
 
 	void _on_changed_style_box();
 	Size2 _get_minimum_size() const override;
+
+	void _gui_input(const Ref<InputEvent> &p_event) override;
 };

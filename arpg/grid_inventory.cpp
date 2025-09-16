@@ -2,6 +2,7 @@
 
 #include "godot_cpp/templates/pair.hpp"
 #include "tools/auto_resgister.h"
+#include "godot_cpp/classes/input_event.hpp"
 
 AUTO_REGISTER_CLASS(GridInventory)
 
@@ -97,6 +98,12 @@ Size2 GridInventory::_get_minimum_size() const {
 	return Size2(total_width, total_height);
 }
 
+// TODO move the mouse evnt to here
+void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
+	Control::_gui_input(p_event);
+
+}
+
 void GridInventory::_draw_bg() {
 	if (!background.is_valid()) {
 		return;
@@ -125,8 +132,8 @@ inline Point2i GridInventory::_get_cell_key(const Point2i point) const {
 		return Point2i(-1, -1);
 	}
 
-	int cell_x = int(adjusted_point.x / (slot_size.x + slot_margin.x));
-	int cell_y = int(adjusted_point.y / (slot_size.y + slot_margin.y));
+	const int cell_x = static_cast<int>(adjusted_point.x / (slot_size.x + slot_margin.x));
+	const int cell_y = static_cast<int>(adjusted_point.y / (slot_size.y + slot_margin.y));
 
 	return Point2i(cell_x, cell_y);
 }
