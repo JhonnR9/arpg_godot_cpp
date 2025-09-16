@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://g5r1otrefvmf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
-bg_color = Color(0.755386, 0.755386, 0.755386, 1)
+bg_color = Color(0.85, 0.807358, 0.7905, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
 bg_color = Color(0.407056, 0.407056, 0.407056, 1)
@@ -12,11 +12,12 @@ border_width_bottom = 1
 border_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f542o"]
+bg_color = Color(0.407843, 0.407843, 0.407843, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0, 0.697667, 0.91, 1)
+border_color = Color(0.84, 0.65352, 0.2184, 1)
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -34,16 +35,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-alignment = 1
+alignment = 2
 
-[node name="GridInventory2" type="GridInventory" parent="BoxContainer"]
+[node name="GridInventory" type="GridInventory" parent="BoxContainer"]
 background = SubResource("StyleBoxFlat_ei5da")
 item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
 rows = 3
-slot_size = Vector2(12, 12)
-slot_margin = Vector2(1, 1)
-grid_padding = Vector2(4, 8)
+columns = 6
+slot_size = Vector2i(14, 14)
+slot_margin = Vector2i(1, 1)
+grid_padding = Vector2i(2, 2)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4

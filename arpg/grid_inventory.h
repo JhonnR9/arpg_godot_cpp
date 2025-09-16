@@ -31,8 +31,8 @@ class GridInventory final : public Control {
 	int columns = 8;
 	Size2 slot_size = Vector2(16, 16);
 	HashMap<Point2i, Rect2> cells;
-	Size2 slot_margin = Vector2(2, 2);
-	Size2 grid_padding = Vector2(4, 4);
+	Size2i slot_margin = Vector2(2, 2);
+	Size2i grid_padding = Vector2(4, 4);
 
 	void _draw_background();
 	void _draw_all_slots();
@@ -62,17 +62,18 @@ public:
 	int get_columns() const;
 	void set_columns(int p_columns);
 
-	Size2 get_slot_size() const;
-	void set_slot_size(const Size2 &p_slot_size);
+	Size2i get_slot_size() const;
+	void set_slot_size(const Size2i &p_slot_size);
 
-	Size2 get_slot_margin() const;
-	void set_slot_margin(const Size2 &p_slot_margin);
+	Size2i get_slot_margin() const;
+	void set_slot_margin(const Size2i &p_slot_margin);
 
-	Size2 get_grid_padding() const;
-	void set_grid_padding(const Size2 &p_grid_padding);
+	Size2i get_grid_padding() const;
+	void set_grid_padding(const Size2i &p_grid_padding);
 
 	void _on_changed_style_box();
 	Size2 _get_minimum_size() const override;
 
 	void _gui_input(const Ref<InputEvent> &p_event) override;
+	void _mouse_exited();
 };

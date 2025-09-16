@@ -12,13 +12,15 @@ inline Ref<StyleBox> GridInventory::get_background() const {
 	return background;
 }
 void GridInventory::set_background(const Ref<StyleBox> &p_bg_style_box) {
-	if (background.is_valid()) {
+	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
+
+	if (background.is_valid() && background->is_connected("changed", callable)) {
 		background->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
 	}
 	this->background = p_bg_style_box;
 
-	if (p_bg_style_box.is_valid()) {
-		p_bg_style_box->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	if (p_bg_style_box.is_valid() && !p_bg_style_box->is_connected("changed", callable)) {
+		p_bg_style_box->connect("changed", callable);
 		queue_redraw();
 	}
 }
@@ -26,13 +28,15 @@ inline Ref<StyleBox> GridInventory::get_item_frame() const {
 	return item_frame;
 }
 void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame_style_box) {
-	if (item_frame.is_valid()) {
-		item_frame->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
+
+	if (item_frame.is_valid() && item_frame->is_connected("changed", callable)) {
+		item_frame->disconnect("changed", callable);
 	}
 	this->item_frame = p_item_frame_style_box;
 
-	if (p_item_frame_style_box.is_valid()) {
-		p_item_frame_style_box->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	if (p_item_frame_style_box.is_valid() && !p_item_frame_style_box->is_connected("changed", callable)) {
+		p_item_frame_style_box->connect("changed", callable);
 		queue_redraw();
 	}
 }
@@ -41,14 +45,16 @@ inline Ref<StyleBox> GridInventory::get_item_frame_hover() const {
 }
 
 void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_style_box_hover) {
-	if (item_frame_hover.is_valid()) {
-		item_frame_hover->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
+
+	if (item_frame_hover.is_valid() && item_frame_hover->is_connected("changed", callable)) {
+		item_frame_hover->disconnect("changed", callable);
 	}
 
 	this->item_frame_hover = p_item_frame_style_box_hover;
 
-	if (p_item_frame_style_box_hover.is_valid()) {
-		p_item_frame_style_box_hover->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	if (p_item_frame_style_box_hover.is_valid() && !p_item_frame_style_box_hover->is_connected("changed", callable)) {
+		p_item_frame_style_box_hover->connect("changed", callable);
 		queue_redraw();
 	}
 }
@@ -68,24 +74,24 @@ void GridInventory::set_columns(int p_columns) {
 	_generate_grid_rects();
 }
 
-inline Vector2 GridInventory::get_slot_size() const {
+inline Size2i GridInventory::get_slot_size() const {
 	return slot_size;
 }
-void GridInventory::set_slot_size(const Vector2 &p_slot_size) {
+void GridInventory::set_slot_size(const Size2i &p_slot_size) {
 	slot_size = p_slot_size;
 	_generate_grid_rects();
 }
-inline Size2 GridInventory::get_slot_margin() const {
+inline Size2i GridInventory::get_slot_margin() const {
 	return slot_margin;
 }
-void GridInventory::set_slot_margin(const Size2 &p_slot_margin) {
+void GridInventory::set_slot_margin(const Size2i &p_slot_margin) {
 	slot_margin = p_slot_margin;
 	_generate_grid_rects();
 }
-inline Size2 GridInventory::get_grid_padding() const {
+inline Size2i GridInventory::get_grid_padding() const {
 	return grid_padding;
 }
-void GridInventory::set_grid_padding(const Size2 &p_grid_padding) {
+void GridInventory::set_grid_padding(const Size2i &p_grid_padding) {
 	grid_padding = p_grid_padding;
 	_generate_grid_rects();
 }
@@ -130,7 +136,6 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		}
 	}
 
-
 	Ref<InputEventMouseButton> mouse_btn = p_event;
 	if (mouse_btn.is_valid() && mouse_btn->is_pressed()) {
 		Point2i pos = mouse_btn->get_position();
@@ -140,11 +145,17 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		}
 	}
 }
+void GridInventory::_mouse_exited() {
+	if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
+		queue_slot_redraw(selected_slot_key, State::DEFAULT);
+		selected_slot_key = Point2i(-1, -1);
+	}
+}
 
 void GridInventory::queue_slot_redraw(Point2i p_key, State p_new_state) {
 	pending_slot_redraw.key = p_key;
 	pending_slot_redraw.new_state = p_new_state;
-	pending_slot_redraw.is_valid =true;
+	pending_slot_redraw.is_valid = true;
 	queue_redraw();
 }
 
@@ -173,21 +184,29 @@ void GridInventory::_draw_all_slots() {
 		item_frame->draw(ci, rect);
 	}
 }
-Point2i GridInventory::_get_cell_key(const Point2i point) const {
-	Vector2 adjusted_point = point - Vector2(grid_padding.x, grid_padding.y);
 
+Point2i GridInventory::_get_cell_key(const Point2i point) const {
+	const Vector2i adjusted_point = point - Vector2(grid_padding.x, grid_padding.y);
 	if (adjusted_point.x < 0 || adjusted_point.y < 0) {
 		return Point2i(-1, -1);
 	}
 
-	const int cell_x = static_cast<int>(adjusted_point.x / (slot_size.x + slot_margin.x));
-	const int cell_y = static_cast<int>(adjusted_point.y / (slot_size.y + slot_margin.y));
+	const int cell_width = slot_size.x + slot_margin.x;
+	const int cell_height = slot_size.y + slot_margin.y;
 
-	if (cell_x >= columns || cell_y >= rows) {
+	if (cell_width <= 0 || cell_height <= 0) {
 		return Point2i(-1, -1);
 	}
 
-	return Point2i(cell_x, cell_y);
+	const int cell_x = adjusted_point.x / cell_width;
+	const int cell_y = adjusted_point.y / cell_height;
+
+	const Point2i key(cell_x, cell_y);
+	if (cells.has(key) && cells[key].has_point(point)) {
+		return key;
+	}
+
+	return Point2i(-1, -1);
 }
 
 void GridInventory::_generate_grid_rects() {
@@ -198,14 +217,14 @@ void GridInventory::_generate_grid_rects() {
 		return;
 	}
 
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < columns; j++) {
+	for (int row = 0; row < rows; row++) {
+		for (int col = 0; col < columns; col++) {
 			Point2 position(
-					grid_padding.x + j * (slot_size.x + slot_margin.x),
-					grid_padding.y + i * (slot_size.y + slot_margin.y));
+					grid_padding.x + col * (slot_size.x + slot_margin.x),
+					grid_padding.y + row * (slot_size.y + slot_margin.y));
 
-			const Rect2 rect(position, slot_size);
-			Point2i key(j, i);
+			Rect2 rect(position, slot_size);
+			Point2i key(col, row);
 
 			cells[key] = rect;
 		}
@@ -224,22 +243,29 @@ void GridInventory::_draw_slot(Point2i p_key, State p_new_state) {
 		}
 	}
 	pending_slot_redraw.is_valid = false;
-
 }
-
 
 void GridInventory::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_DRAW: {
+			// Godot clears the canvas on each redraw for Control nodes, so full redraw is always required.
 			_draw_background();
 			_draw_all_slots();
+
+			// Draw the hovered or updated slot over the grid
 			if (pending_slot_redraw.is_valid) {
 				_draw_slot(pending_slot_redraw.key, pending_slot_redraw.new_state);
 			}
 			break;
 		}
 		case NOTIFICATION_ENTER_TREE: {
+			// Generate grid on first-time setup
 			_generate_grid_rects();
+
+			auto callable = callable_mp(this, &GridInventory::_mouse_exited);
+			if (!is_connected("mouse_exited", callable)) {
+				this->connect("mouse_exited", callable);
+			}
 			break;
 		}
 
@@ -281,8 +307,8 @@ void GridInventory::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "rows", PROPERTY_HINT_RANGE, "1,100,1"), "set_rows", "get_rows");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "columns", PROPERTY_HINT_RANGE, "1,100,1"), "set_columns", "get_columns");
 
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "slot_size", PROPERTY_HINT_NONE, ""), "set_slot_size", "get_slot_size");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "slot_margin", PROPERTY_HINT_NONE, ""), "set_slot_margin", "get_slot_margin");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "slot_size", PROPERTY_HINT_NONE, ""), "set_slot_size", "get_slot_size");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "slot_margin", PROPERTY_HINT_NONE, ""), "set_slot_margin", "get_slot_margin");
 
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "grid_padding", PROPERTY_HINT_NONE, ""), "set_grid_padding", "get_grid_padding");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "grid_padding", PROPERTY_HINT_NONE, ""), "set_grid_padding", "get_grid_padding");
 }
