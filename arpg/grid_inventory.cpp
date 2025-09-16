@@ -5,31 +5,47 @@
 
 AUTO_REGISTER_CLASS(GridInventory)
 
-inline Ref<StyleBox> GridInventory::get_bg_style_box() const {
-	return bg_style_box;
+inline Ref<StyleBox> GridInventory::get_background() const {
+	return background;
 }
-void GridInventory::set_bg_style_box(const Ref<StyleBox> &p_bg_style_box) {
-	if (bg_style_box.is_valid()) {
-		bg_style_box->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+void GridInventory::set_background(const Ref<StyleBox> &p_bg_style_box) {
+	if (background.is_valid()) {
+		background->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
 	}
-	this->bg_style_box = p_bg_style_box;
+	this->background = p_bg_style_box;
 
 	if (p_bg_style_box.is_valid()) {
 		p_bg_style_box->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
 		queue_redraw();
 	}
 }
-inline Ref<StyleBox> GridInventory::get_item_frame_style_box() const {
-	return item_frame_style_box;
+inline Ref<StyleBox> GridInventory::get_item_frame() const {
+	return item_frame;
 }
-void GridInventory::set_item_frame_style_box(const Ref<StyleBox> &p_item_frame_style_box) {
-	if (item_frame_style_box.is_valid()) {
-		item_frame_style_box->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame_style_box) {
+	if (item_frame.is_valid()) {
+		item_frame->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
 	}
-	this->item_frame_style_box = p_item_frame_style_box;
+	this->item_frame = p_item_frame_style_box;
 
 	if (p_item_frame_style_box.is_valid()) {
 		p_item_frame_style_box->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+		queue_redraw();
+	}
+}
+inline Ref<StyleBox> GridInventory::get_item_frame_hover() const {
+	return item_frame_hover;
+}
+
+void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_style_box_hover) {
+	if (item_frame_hover.is_valid()) {
+		item_frame_hover->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
+	}
+
+	this->item_frame_hover = p_item_frame_style_box_hover;
+
+	if (p_item_frame_style_box_hover.is_valid()) {
+		p_item_frame_style_box_hover->connect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
 		queue_redraw();
 	}
 }
@@ -82,24 +98,37 @@ Size2 GridInventory::_get_minimum_size() const {
 }
 
 void GridInventory::_draw_bg() {
-	ERR_FAIL_NULL(bg_style_box.ptr());
+	if (!background.is_valid()) {
+		return;
+	}
 
 	const RID ci = get_canvas_item();
 	const Rect2 rect(Point2(0, 0), get_size());
 
-	bg_style_box->draw(ci, rect);
+	background->draw(ci, rect);
 }
 void GridInventory::_draw_item_frame() {
-	ERR_FAIL_NULL(item_frame_style_box.ptr());
+	if (!item_frame.is_valid()) {
+		return;
+	}
 	const RID ci = get_canvas_item();
 
 	for (const KeyValue<Point2i, Rect2> &kv : cells) {
 		const Rect2 &rect = kv.value;
-		item_frame_style_box->draw(ci, rect);
+		item_frame->draw(ci, rect);
 	}
 }
 inline Point2i GridInventory::_get_cell_key(const Point2i point) const {
-	return Point2i(point.x / slot_size.x, point.y / slot_size.y);
+	Vector2 adjusted_point = point - Vector2(grid_padding.x, grid_padding.y);
+
+	if (adjusted_point.x < 0 || adjusted_point.y < 0) {
+		return Point2i(-1, -1);
+	}
+
+	int cell_x = int(adjusted_point.x / (slot_size.x + slot_margin.x));
+	int cell_y = int(adjusted_point.y / (slot_size.y + slot_margin.y));
+
+	return Point2i(cell_x, cell_y);
 }
 
 void GridInventory::_generate_grid_rects() {
@@ -127,6 +156,31 @@ void GridInventory::_generate_grid_rects() {
 	queue_redraw();
 }
 
+void GridInventory::_change_draw_state(Point2i p_key, State p_new_state) {
+	if (selected_slot_key == p_key) {
+		return;
+	}
+
+	const RID ci = get_canvas_item();
+
+	if (cells.has(selected_slot_key)) {
+		if (item_frame.is_valid()) {
+			item_frame->draw(ci, cells[selected_slot_key]);
+		}
+	}
+
+	if (cells.has(p_key)) {
+		if (p_new_state == HOVER && item_frame_hover.is_valid()) {
+			item_frame_hover->draw(ci, cells[p_key]);
+		} else if (item_frame.is_valid()) {
+			item_frame->draw(ci, cells[p_key]);
+		}
+	}
+
+	selected_slot_key = p_key;
+}
+
+
 void GridInventory::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_DRAW: {
@@ -134,19 +188,41 @@ void GridInventory::_notification(int p_what) {
 			_draw_item_frame();
 			break;
 		}
-		case NOTIFICATION_ENTER_TREE:
+		case NOTIFICATION_ENTER_TREE: {
 			_generate_grid_rects();
+			set_process(true);
 			break;
+		}
+
+		case NOTIFICATION_PROCESS: {
+			Point2i mouse_position = get_local_mouse_position();
+
+			Point2i key = _get_cell_key(mouse_position);
+			if (cells.has(key)) {
+				_change_draw_state(key, HOVER);
+			}else {
+				if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
+					_change_draw_state(selected_slot_key, DEFAULT);
+					selected_slot_key = Point2i(-1, -1);
+				}
+
+			}
+
+			break;
+		}
 		default:;
 	}
 }
 
 void GridInventory::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_bg_style_box"), &GridInventory::get_bg_style_box);
-	ClassDB::bind_method(D_METHOD("set_bg_style_box", "bg_style_box"), &GridInventory::set_bg_style_box);
+	ClassDB::bind_method(D_METHOD("get_background"), &GridInventory::get_background);
+	ClassDB::bind_method(D_METHOD("set_background", "background"), &GridInventory::set_background);
 
-	ClassDB::bind_method(D_METHOD("get_item_frame_style_box"), &GridInventory::get_item_frame_style_box);
-	ClassDB::bind_method(D_METHOD("set_item_frame_style_box", "item_frame_style_box"), &GridInventory::set_item_frame_style_box);
+	ClassDB::bind_method(D_METHOD("get_item_frame"), &GridInventory::get_item_frame);
+	ClassDB::bind_method(D_METHOD("set_item_frame", "item_frame"), &GridInventory::set_item_frame);
+
+	ClassDB::bind_method(D_METHOD("get_item_frame_hover"), &GridInventory::get_item_frame_hover);
+	ClassDB::bind_method(D_METHOD("set_item_frame_hover", "item_frame_hover"), &GridInventory::set_item_frame_hover);
 
 	ClassDB::bind_method(D_METHOD("get_rows"), &GridInventory::get_rows);
 	ClassDB::bind_method(D_METHOD("set_rows", "rows"), &GridInventory::set_rows);
@@ -163,9 +239,12 @@ void GridInventory::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_grid_padding"), &GridInventory::get_grid_padding);
 	ClassDB::bind_method(D_METHOD("set_grid_padding", "grid_padding"), &GridInventory::set_grid_padding);
 
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bg_style_box", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Background Style Box"), "set_bg_style_box", "get_bg_style_box");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame_style_box", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame Style Box"), "set_item_frame_style_box", "get_item_frame_style_box");
+	ADD_SUBGROUP("Styles", "");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "background", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Background"), "set_background", "get_background");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame"), "set_item_frame", "get_item_frame");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame_hover", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame Hover"), "set_item_frame_hover", "get_item_frame_hover");
 
+	ADD_SUBGROUP("Layout", "");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "rows", PROPERTY_HINT_RANGE, "1,100,1"), "set_rows", "get_rows");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "columns", PROPERTY_HINT_RANGE, "1,100,1"), "set_columns", "get_columns");
 
