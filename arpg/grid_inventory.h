@@ -17,7 +17,15 @@ class GridInventory final : public Control {
 		DEFAULT
 	};
 
+	struct {
+		Point2i key{};
+		State new_state{};
+		bool is_valid{false};
+	} pending_slot_redraw;
+
 	Point2i selected_slot_key = Point2i(-1, -1);
+	void queue_slot_redraw(Point2i p_key, State p_new_state);
+	void queue_grid_redraw();
 
 	int rows = 4;
 	int columns = 8;
@@ -26,11 +34,11 @@ class GridInventory final : public Control {
 	Size2 slot_margin = Vector2(2, 2);
 	Size2 grid_padding = Vector2(4, 4);
 
-	void _draw_bg();
-	void _draw_item_frame();
+	void _draw_background();
+	void _draw_all_slots();
 	Point2i _get_cell_key(Point2i point) const;
 	void _generate_grid_rects();
-	void _change_draw_state(Point2i p_key, State p_new_state);
+	void _draw_slot(Point2i p_key, State p_new_state);
 
 protected:
 	static void _bind_methods();

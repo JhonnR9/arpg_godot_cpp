@@ -1,8 +1,10 @@
 #include "grid_inventory.h"
 
+#include "godot_cpp/classes/input_event.hpp"
+#include "godot_cpp/classes/input_event_mouse_button.hpp"
+#include "godot_cpp/classes/input_event_mouse_motion.hpp"
 #include "godot_cpp/templates/pair.hpp"
 #include "tools/auto_resgister.h"
-#include "godot_cpp/classes/input_event.hpp"
 
 AUTO_REGISTER_CLASS(GridInventory)
 
@@ -98,13 +100,59 @@ Size2 GridInventory::_get_minimum_size() const {
 	return Size2(total_width, total_height);
 }
 
-// TODO move the mouse evnt to here
 void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 	Control::_gui_input(p_event);
 
+	if (p_event.is_null()) {
+		return;
+	}
+
+	Ref<InputEventMouseMotion> motion = p_event;
+
+	if (motion.is_valid()) {
+		Point2i pos = motion->get_position();
+		Point2i key = _get_cell_key(pos);
+
+		if (cells.has(key)) {
+			if (key != selected_slot_key) {
+				if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
+					queue_slot_redraw(selected_slot_key, State::DEFAULT);
+				}
+
+				queue_slot_redraw(key, State::HOVER);
+				selected_slot_key = key;
+			}
+		} else {
+			if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
+				queue_slot_redraw(selected_slot_key, State::DEFAULT);
+				selected_slot_key = Point2i(-1, -1);
+			}
+		}
+	}
+
+
+	Ref<InputEventMouseButton> mouse_btn = p_event;
+	if (mouse_btn.is_valid() && mouse_btn->is_pressed()) {
+		Point2i pos = mouse_btn->get_position();
+		Point2i key = _get_cell_key(pos);
+		if (cells.has(key)) {
+			// TODO drag and drop system, and slot clicked signal
+		}
+	}
 }
 
-void GridInventory::_draw_bg() {
+void GridInventory::queue_slot_redraw(Point2i p_key, State p_new_state) {
+	pending_slot_redraw.key = p_key;
+	pending_slot_redraw.new_state = p_new_state;
+	pending_slot_redraw.is_valid =true;
+	queue_redraw();
+}
+
+void GridInventory::queue_grid_redraw() {
+	update_minimum_size();
+	queue_redraw();
+}
+void GridInventory::_draw_background() {
 	if (!background.is_valid()) {
 		return;
 	}
@@ -114,7 +162,7 @@ void GridInventory::_draw_bg() {
 
 	background->draw(ci, rect);
 }
-void GridInventory::_draw_item_frame() {
+void GridInventory::_draw_all_slots() {
 	if (!item_frame.is_valid()) {
 		return;
 	}
@@ -125,7 +173,7 @@ void GridInventory::_draw_item_frame() {
 		item_frame->draw(ci, rect);
 	}
 }
-inline Point2i GridInventory::_get_cell_key(const Point2i point) const {
+Point2i GridInventory::_get_cell_key(const Point2i point) const {
 	Vector2 adjusted_point = point - Vector2(grid_padding.x, grid_padding.y);
 
 	if (adjusted_point.x < 0 || adjusted_point.y < 0) {
@@ -135,6 +183,10 @@ inline Point2i GridInventory::_get_cell_key(const Point2i point) const {
 	const int cell_x = static_cast<int>(adjusted_point.x / (slot_size.x + slot_margin.x));
 	const int cell_y = static_cast<int>(adjusted_point.y / (slot_size.y + slot_margin.y));
 
+	if (cell_x >= columns || cell_y >= rows) {
+		return Point2i(-1, -1);
+	}
+
 	return Point2i(cell_x, cell_y);
 }
 
@@ -142,8 +194,7 @@ void GridInventory::_generate_grid_rects() {
 	cells.clear();
 
 	if (slot_size.x < 1 || slot_size.y < 1) {
-		update_minimum_size();
-		queue_redraw();
+		queue_grid_redraw();
 		return;
 	}
 
@@ -154,69 +205,44 @@ void GridInventory::_generate_grid_rects() {
 					grid_padding.y + i * (slot_size.y + slot_margin.y));
 
 			const Rect2 rect(position, slot_size);
-			Point2i key = _get_cell_key(position);
+			Point2i key(j, i);
 
 			cells[key] = rect;
 		}
 	}
-	update_minimum_size();
-	queue_redraw();
+	queue_grid_redraw();
 }
 
-void GridInventory::_change_draw_state(Point2i p_key, State p_new_state) {
-	if (selected_slot_key == p_key) {
-		return;
-	}
-
+void GridInventory::_draw_slot(Point2i p_key, State p_new_state) {
 	const RID ci = get_canvas_item();
-
-	if (cells.has(selected_slot_key)) {
-		if (item_frame.is_valid()) {
-			item_frame->draw(ci, cells[selected_slot_key]);
-		}
-	}
 
 	if (cells.has(p_key)) {
 		if (p_new_state == HOVER && item_frame_hover.is_valid()) {
 			item_frame_hover->draw(ci, cells[p_key]);
-		} else if (item_frame.is_valid()) {
+		} else if (p_new_state == State::DEFAULT && item_frame.is_valid()) {
 			item_frame->draw(ci, cells[p_key]);
 		}
 	}
+	pending_slot_redraw.is_valid = false;
 
-	selected_slot_key = p_key;
 }
 
 
 void GridInventory::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_DRAW: {
-			_draw_bg();
-			_draw_item_frame();
+			_draw_background();
+			_draw_all_slots();
+			if (pending_slot_redraw.is_valid) {
+				_draw_slot(pending_slot_redraw.key, pending_slot_redraw.new_state);
+			}
 			break;
 		}
 		case NOTIFICATION_ENTER_TREE: {
 			_generate_grid_rects();
-			set_process(true);
 			break;
 		}
 
-		case NOTIFICATION_PROCESS: {
-			Point2i mouse_position = get_local_mouse_position();
-
-			Point2i key = _get_cell_key(mouse_position);
-			if (cells.has(key)) {
-				_change_draw_state(key, HOVER);
-			}else {
-				if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
-					_change_draw_state(selected_slot_key, DEFAULT);
-					selected_slot_key = Point2i(-1, -1);
-				}
-
-			}
-
-			break;
-		}
 		default:;
 	}
 }
