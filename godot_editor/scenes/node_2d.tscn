@@ -1,4 +1,4 @@
-[gd_scene load_steps=86 format=4 uid="uid://bmbbovs8vnafl"]
+[gd_scene load_steps=87 format=4 uid="uid://bmbbovs8vnafl"]
 
 [ext_resource type="Script" uid="uid://cbqxmfinjwffg" path="res://scripts/animation_controller.gd" id="2_fws66"]
 [ext_resource type="Texture2D" uid="uid://db5how8h8dgiq" path="res://Sprites/Cute_Fantasy/NPCs (Premade)/Bartender_Katy.png" id="4_fws66"]
@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://6fwityh2ptku" path="res://Sprites/Cute_Fantasy/Trees/Medium_Birch_Tree.png" id="18_unr0g"]
 [ext_resource type="Texture2D" uid="uid://xgow35wmbyt1" path="res://Sprites/Cute_Fantasy/Trees/Medium_Fruit_Tree.png" id="19_jt3n0"]
 [ext_resource type="Texture2D" uid="uid://duyhwiofr03tx" path="res://Sprites/Cute_Fantasy/Trees/Medium_Oak_Tree.png" id="20_7pfoh"]
+[ext_resource type="PackedScene" uid="uid://g5r1otrefvmf" path="res://test_inventory.tscn" id="20_k6u5g"]
 [ext_resource type="Texture2D" uid="uid://b8v45jc8bucp1" path="res://Sprites/Cute_Fantasy/Trees/Medium_Spruce_Tree.png" id="21_mchk4"]
 [ext_resource type="Texture2D" uid="uid://b16phlbiy2yn4" path="res://Sprites/Cute_Fantasy/Trees/Oak_Leaf_Particle.png" id="22_gmqbl"]
 
@@ -283,6 +284,122 @@ sources/14 = SubResource("TileSetAtlasSource_nuk1v")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_epypp"]
 size = Vector2(8, 3)
+
+[sub_resource type="Animation" id="Animation_j7wrs"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:speed_scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_rj586"]
+resource_name = "idle_left"
+length = 0.797
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:speed_scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.366667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.3]
+}
+
+[sub_resource type="Animation" id="Animation_x0ka3"]
+resource_name = "idle_right"
+length = 1.006
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_fws66"]
+resource_name = "run_left"
+length = 1.006
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_hh0fu"]
+resource_name = "run_right"
+length = 1.006
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rj586"]
+_data = {
+&"RESET": SubResource("Animation_j7wrs"),
+&"idle_left": SubResource("Animation_rj586"),
+&"idle_right": SubResource("Animation_x0ka3"),
+&"run_left": SubResource("Animation_fws66"),
+&"run_right": SubResource("Animation_hh0fu")
+}
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hh0fu"]
 atlas = ExtResource("4_fws66")
@@ -639,122 +756,6 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="Animation" id="Animation_j7wrs"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:speed_scale")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [1.0]
-}
-
-[sub_resource type="Animation" id="Animation_rj586"]
-resource_name = "idle_left"
-length = 0.797
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:speed_scale")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.366667),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [1.0, 0.3]
-}
-
-[sub_resource type="Animation" id="Animation_x0ka3"]
-resource_name = "idle_right"
-length = 1.006
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-
-[sub_resource type="Animation" id="Animation_fws66"]
-resource_name = "run_left"
-length = 1.006
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-
-[sub_resource type="Animation" id="Animation_hh0fu"]
-resource_name = "run_right"
-length = 1.006
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:flip_h")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_rj586"]
-_data = {
-&"RESET": SubResource("Animation_j7wrs"),
-&"idle_left": SubResource("Animation_rj586"),
-&"idle_right": SubResource("Animation_x0ka3"),
-&"run_left": SubResource("Animation_fws66"),
-&"run_right": SubResource("Animation_hh0fu")
-}
-
 [node name="ARPG" type="Node2D"]
 y_sort_enabled = true
 
@@ -788,6 +789,12 @@ shape = SubResource("RectangleShape2D_epypp")
 [node name="AnimationController" type="AnimationController" parent="FloatingCharacter2D"]
 script = ExtResource("2_fws66")
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FloatingCharacter2D/AnimationController"]
+libraries = {
+&"": SubResource("AnimationLibrary_rj586")
+}
+speed_scale = 0.2
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="FloatingCharacter2D/AnimationController"]
 z_index = 4
 position = Vector2(0, -6)
@@ -796,15 +803,18 @@ animation = &"idle_down"
 autoplay = "idle_down"
 frame_progress = 0.0900127
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FloatingCharacter2D/AnimationController"]
-libraries = {
-&"": SubResource("AnimationLibrary_rj586")
-}
-speed_scale = 0.2
-
 [node name="Camera2D" type="Camera2D" parent="FloatingCharacter2D"]
 position_smoothing_enabled = true
 position_smoothing_speed = 4.0
+rotation_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Iventory" parent="CanvasLayer" instance=ExtResource("20_k6u5g")]
+size_flags_horizontal = 0
+size_flags_vertical = 4
 
 [connection signal="direction_name_changed" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_direction_name_changed"]
 [connection signal="start_move" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_start_move"]

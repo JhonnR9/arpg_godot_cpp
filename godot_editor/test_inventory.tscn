@@ -1,25 +1,44 @@
 [gd_scene load_steps=4 format=3 uid="uid://g5r1otrefvmf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
-bg_color = Color(0.85, 0.807358, 0.7905, 1)
+bg_color = Color(0.2784, 0.29856, 0.48, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
-bg_color = Color(0.407056, 0.407056, 0.407056, 1)
+bg_color = Color(0.147672, 0.147672, 0.147672, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0, 0, 0, 1)
+border_color = Color(0.7396, 0.833913, 0.86, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f542o"]
-bg_color = Color(0.407843, 0.407843, 0.407843, 1)
+bg_color = Color(0.227451, 0.227451, 0.227451, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.84, 0.65352, 0.2184, 1)
+border_color = Color(1, 0.383084, 0.115257, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+anti_aliasing = false
 
-[node name="Control" type="Control"]
+[node name="Iventory" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,15 +54,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-alignment = 2
+alignment = 1
 
 [node name="GridInventory" type="GridInventory" parent="BoxContainer"]
 background = SubResource("StyleBoxFlat_ei5da")
 item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
+columns = 7
 slot_size = Vector2i(14, 14)
-slot_margin = Vector2i(4, 1)
-grid_padding = Vector2i(2, 2)
+slot_margin = Vector2i(1, 1)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4

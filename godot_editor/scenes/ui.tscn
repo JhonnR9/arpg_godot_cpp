@@ -325,7 +325,9 @@ text = "quit"
 [node name="GridInventory" type="GridInventory" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
+theme_type_variation = &"GridInventory"
 
 [node name="GridInventory2" type="GridInventory" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
+theme_type_variation = &"GridInventory"

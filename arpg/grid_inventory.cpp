@@ -5,58 +5,39 @@
 #include "godot_cpp/classes/input_event_mouse_motion.hpp"
 #include "godot_cpp/templates/pair.hpp"
 #include "tools/auto_resgister.h"
+#include "godot_cpp/classes/theme_db.hpp"
+#include "godot_cpp/classes/theme.hpp"
 
+using namespace godot;
 AUTO_REGISTER_CLASS(GridInventory)
 
 inline Ref<StyleBox> GridInventory::get_background() const {
 	return background;
 }
-void GridInventory::set_background(const Ref<StyleBox> &p_bg_style_box) {
-	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
-
-	if (background.is_valid() && background->is_connected("changed", callable)) {
-		background->disconnect("changed", callable_mp(this, &GridInventory::_on_changed_style_box));
-	}
-	this->background = p_bg_style_box;
-
-	if (p_bg_style_box.is_valid() && !p_bg_style_box->is_connected("changed", callable)) {
-		p_bg_style_box->connect("changed", callable);
-		queue_redraw();
-	}
+void GridInventory::set_background(const Ref<StyleBox> &p_background) {
+	_disconnect_signals(item_frame);
+	_connect_signals(p_background);
+	this->background = p_background;
+	queue_redraw();
 }
 inline Ref<StyleBox> GridInventory::get_item_frame() const {
 	return item_frame;
 }
-void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame_style_box) {
-	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
-
-	if (item_frame.is_valid() && item_frame->is_connected("changed", callable)) {
-		item_frame->disconnect("changed", callable);
-	}
-	this->item_frame = p_item_frame_style_box;
-
-	if (p_item_frame_style_box.is_valid() && !p_item_frame_style_box->is_connected("changed", callable)) {
-		p_item_frame_style_box->connect("changed", callable);
-		queue_redraw();
-	}
+void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame) {
+	_disconnect_signals(item_frame);
+	_connect_signals(p_item_frame);
+	this->item_frame = p_item_frame;
+	queue_redraw();
 }
 inline Ref<StyleBox> GridInventory::get_item_frame_hover() const {
 	return item_frame_hover;
 }
 
-void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_style_box_hover) {
-	const auto callable = callable_mp(this, &GridInventory::_on_changed_style_box);
-
-	if (item_frame_hover.is_valid() && item_frame_hover->is_connected("changed", callable)) {
-		item_frame_hover->disconnect("changed", callable);
-	}
-
-	this->item_frame_hover = p_item_frame_style_box_hover;
-
-	if (p_item_frame_style_box_hover.is_valid() && !p_item_frame_style_box_hover->is_connected("changed", callable)) {
-		p_item_frame_style_box_hover->connect("changed", callable);
-		queue_redraw();
-	}
+void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_hover) {
+	_disconnect_signals(item_frame_hover);
+	_connect_signals(p_item_frame_hover);
+	this->item_frame_hover = p_item_frame_hover;
+	queue_redraw();
 }
 
 inline int GridInventory::get_rows() const {
@@ -96,9 +77,6 @@ void GridInventory::set_grid_padding(const Size2i &p_grid_padding) {
 	_generate_grid_rects();
 }
 
-void GridInventory::_on_changed_style_box() {
-	queue_redraw();
-}
 Size2 GridInventory::_get_minimum_size() const {
 	const int total_width = grid_padding.x * 2 + columns * slot_size.x + (columns - 1) * slot_margin.x;
 	const int total_height = grid_padding.y * 2 + rows * slot_size.y + (rows - 1) * slot_margin.y;
@@ -148,6 +126,23 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 void GridInventory::_mouse_exited() {
 	_flush_hover_if_needed();
 }
+void GridInventory::_on_style_changed() {
+	queue_redraw();
+}
+void GridInventory::_connect_signals(const Ref<StyleBox> &p_style) {
+	const auto callable =  callable_mp(this, &GridInventory::_on_style_changed);
+
+	if (p_style.is_valid() && !p_style->is_connected("changed", callable)) {
+		p_style->connect("changed", callable);
+	}
+}
+void GridInventory::_disconnect_signals(const Ref<StyleBox> &p_style) {
+	const auto callable=  callable_mp(this, &GridInventory::_on_style_changed);
+
+	if (p_style.is_valid() && !p_style->is_connected("changed", callable)) {
+		p_style->disconnect("changed", callable);
+	}
+}
 
 void GridInventory::_draw_background() {
 	if (!background.is_valid()) {
@@ -160,7 +155,7 @@ void GridInventory::_draw_background() {
 	background->draw(ci, rect);
 }
 void GridInventory::_draw_all_slots() {
-	if (!item_frame.is_valid()) {
+	if (item_frame.is_null() || item_frame_hover.is_null()) {
 		return;
 	}
 	const RID ci = get_canvas_item();
@@ -249,16 +244,41 @@ void GridInventory::_notification(int p_what) {
 			update_minimum_size();
 			queue_redraw();
 
+			_connect_signals(item_frame);
+			_connect_signals(item_frame_hover);
+
 			auto callable = callable_mp(this, &GridInventory::_mouse_exited);
 			if (!is_connected("mouse_exited", callable)) {
 				this->connect("mouse_exited", callable);
 			}
 			break;
 		}
+		case NOTIFICATION_EXIT_TREE: {
+			const auto callable = callable_mp(this, &GridInventory::_mouse_exited);
+
+			_disconnect_signals(item_frame);
+			_disconnect_signals(item_frame_hover);
+
+			if (is_connected("mouse_exited", callable)) {
+				this->disconnect("mouse_exited", callable);
+			}
+			break;
+		}
+		case NOTIFICATION_APPLICATION_FOCUS_IN: {
+			_connect_signals(item_frame);
+			_connect_signals(item_frame_hover);
+			break;
+		}
+		case NOTIFICATION_APPLICATION_FOCUS_OUT: {
+			_disconnect_signals(item_frame);
+			_disconnect_signals(item_frame_hover);
+			break;
+		}
 
 		default:;
 	}
 }
+
 
 void GridInventory::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_background"), &GridInventory::get_background);
@@ -298,4 +318,9 @@ void GridInventory::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "slot_margin", PROPERTY_HINT_NONE, ""), "set_slot_margin", "get_slot_margin");
 
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2I, "grid_padding", PROPERTY_HINT_NONE, ""), "set_grid_padding", "get_grid_padding");
+
+
+
+
+
 }

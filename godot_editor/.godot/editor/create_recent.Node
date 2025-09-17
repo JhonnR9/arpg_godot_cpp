@@ -1,6 +1,7 @@
+CanvasLayer
+GridInventory
 BoxContainer
 Control
-GridInventory
 TextureRect
 Node2D
 Panel

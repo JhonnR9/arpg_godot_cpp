@@ -4,8 +4,6 @@
 #include "godot_cpp/templates/hash_map.hpp"
 
 namespace godot {
-}
-using namespace godot;
 
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
@@ -41,21 +39,25 @@ class GridInventory final : public Control {
 	void _generate_grid_rects();
 	void _flush_hover_if_needed();
 
+	struct {
+		Ref<StyleBox> normal;
+	} theme_cache;
+
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 
 public:
-	GridInventory() = default;
+	GridInventory()=default;
 
 	Ref<StyleBox> get_background() const;
-	void set_background(const Ref<StyleBox> &p_bg_style_box);
+	void set_background(const Ref<StyleBox> &p_background);
 
 	Ref<StyleBox> get_item_frame() const;
-	void set_item_frame(const Ref<StyleBox> &p_item_frame_style_box);
+	void set_item_frame(const Ref<StyleBox> &p_item_frame);
 
 	Ref<StyleBox> get_item_frame_hover() const;
-	void set_item_frame_hover(const Ref<StyleBox> &p_item_frame_style_box_hover);
+	void set_item_frame_hover(const Ref<StyleBox> &p_item_frame_hover);
 
 	int get_rows() const;
 	void set_rows(int p_rows);
@@ -72,9 +74,14 @@ public:
 	Size2i get_grid_padding() const;
 	void set_grid_padding(const Size2i &p_grid_padding);
 
-	void _on_changed_style_box();
 	Size2 _get_minimum_size() const override;
 
 	void _gui_input(const Ref<InputEvent> &p_event) override;
 	void _mouse_exited();
+	void _on_style_changed();
+
+	void _connect_signals(const Ref<StyleBox> &p_style);
+	void _disconnect_signals(const Ref<StyleBox> &p_style);
 };
+
+} //namespace godot
