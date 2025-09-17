@@ -3,6 +3,8 @@
 #include "godot_cpp/classes/style_box.hpp"
 #include "godot_cpp/templates/hash_map.hpp"
 
+namespace godot {
+}
 using namespace godot;
 
 class GridInventory final : public Control {
@@ -17,20 +19,19 @@ class GridInventory final : public Control {
 		DEFAULT
 	};
 
-	struct {
-		Point2i key{};
-		State new_state{};
-		bool is_valid{false};
-	} pending_slot_redraw;
+	struct Slot {
+		State state = DEFAULT;
+		Rect2i rect;
+		Ref<Texture2D> item_texture;
+		int item_amount = 0;
+	};
 
 	Point2i selected_slot_key = Point2i(-1, -1);
-	void queue_slot_redraw(Point2i p_key, State p_new_state);
-	void queue_grid_redraw();
 
 	int rows = 4;
 	int columns = 8;
 	Size2 slot_size = Vector2(16, 16);
-	HashMap<Point2i, Rect2> cells;
+	HashMap<Point2i, Slot> cells;
 	Size2i slot_margin = Vector2(2, 2);
 	Size2i grid_padding = Vector2(4, 4);
 
@@ -38,7 +39,7 @@ class GridInventory final : public Control {
 	void _draw_all_slots();
 	Point2i _get_cell_key(Point2i point) const;
 	void _generate_grid_rects();
-	void _draw_slot(Point2i p_key, State p_new_state);
+	void _flush_hover_if_needed();
 
 protected:
 	static void _bind_methods();

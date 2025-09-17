@@ -100,8 +100,8 @@ void GridInventory::_on_changed_style_box() {
 	queue_redraw();
 }
 Size2 GridInventory::_get_minimum_size() const {
-	const real_t total_width = grid_padding.x * 2 + columns * slot_size.x + (columns - 1) * slot_margin.x;
-	const real_t total_height = grid_padding.y * 2 + rows * slot_size.y + (rows - 1) * slot_margin.y;
+	const int total_width = grid_padding.x * 2 + columns * slot_size.x + (columns - 1) * slot_margin.x;
+	const int total_height = grid_padding.y * 2 + rows * slot_size.y + (rows - 1) * slot_margin.y;
 
 	return Size2(total_width, total_height);
 }
@@ -113,56 +113,42 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		return;
 	}
 
-	Ref<InputEventMouseMotion> motion = p_event;
-
+	const Ref<InputEventMouseMotion> motion = p_event;
 	if (motion.is_valid()) {
-		Point2i pos = motion->get_position();
-		Point2i key = _get_cell_key(pos);
+		const Point2i pos = motion->get_position();
+		const Point2i key = _get_cell_key(pos);
 
 		if (cells.has(key)) {
-			if (key != selected_slot_key) {
-				if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
-					queue_slot_redraw(selected_slot_key, State::DEFAULT);
-				}
+			if (key == selected_slot_key) {
+				return;
+			}
+			// Clear previous state before change
+			if (cells.has(selected_slot_key)) {
+				cells[selected_slot_key].state = State::DEFAULT;
+			}
 
-				queue_slot_redraw(key, State::HOVER);
-				selected_slot_key = key;
-			}
+			cells[key].state = State::HOVER;
+			selected_slot_key = key;
+			queue_redraw();
+
 		} else {
-			if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
-				queue_slot_redraw(selected_slot_key, State::DEFAULT);
-				selected_slot_key = Point2i(-1, -1);
-			}
+			_flush_hover_if_needed();
 		}
 	}
 
-	Ref<InputEventMouseButton> mouse_btn = p_event;
+	const Ref<InputEventMouseButton> mouse_btn = p_event;
 	if (mouse_btn.is_valid() && mouse_btn->is_pressed()) {
-		Point2i pos = mouse_btn->get_position();
-		Point2i key = _get_cell_key(pos);
+		const Point2i pos = mouse_btn->get_position();
+		const Point2i key = _get_cell_key(pos);
 		if (cells.has(key)) {
 			// TODO drag and drop system, and slot clicked signal
 		}
 	}
 }
 void GridInventory::_mouse_exited() {
-	if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
-		queue_slot_redraw(selected_slot_key, State::DEFAULT);
-		selected_slot_key = Point2i(-1, -1);
-	}
+	_flush_hover_if_needed();
 }
 
-void GridInventory::queue_slot_redraw(Point2i p_key, State p_new_state) {
-	pending_slot_redraw.key = p_key;
-	pending_slot_redraw.new_state = p_new_state;
-	pending_slot_redraw.is_valid = true;
-	queue_redraw();
-}
-
-void GridInventory::queue_grid_redraw() {
-	update_minimum_size();
-	queue_redraw();
-}
 void GridInventory::_draw_background() {
 	if (!background.is_valid()) {
 		return;
@@ -179,9 +165,14 @@ void GridInventory::_draw_all_slots() {
 	}
 	const RID ci = get_canvas_item();
 
-	for (const KeyValue<Point2i, Rect2> &kv : cells) {
-		const Rect2 &rect = kv.value;
-		item_frame->draw(ci, rect);
+	for (const KeyValue<Point2i, Slot> &kv : cells) {
+		const Slot &slot = kv.value;
+
+		if (slot.state == State::HOVER) {
+			item_frame_hover->draw(ci, slot.rect);
+		} else if (slot.state == State::DEFAULT) {
+			item_frame->draw(ci, slot.rect);
+		}
 	}
 }
 
@@ -202,7 +193,7 @@ Point2i GridInventory::_get_cell_key(const Point2i point) const {
 	const int cell_y = adjusted_point.y / cell_height;
 
 	const Point2i key(cell_x, cell_y);
-	if (cells.has(key) && cells[key].has_point(point)) {
+	if (cells.has(key) && cells[key].rect.has_point(point)) {
 		return key;
 	}
 
@@ -213,36 +204,35 @@ void GridInventory::_generate_grid_rects() {
 	cells.clear();
 
 	if (slot_size.x < 1 || slot_size.y < 1) {
-		queue_grid_redraw();
+		update_minimum_size();
+		queue_redraw();
 		return;
 	}
 
 	for (int row = 0; row < rows; row++) {
 		for (int col = 0; col < columns; col++) {
-			Point2 position(
-					grid_padding.x + col * (slot_size.x + slot_margin.x),
-					grid_padding.y + row * (slot_size.y + slot_margin.y));
+			const int x = grid_padding.x + col * (slot_size.x + slot_margin.x);
+			const int y = grid_padding.y + row * (slot_size.y + slot_margin.y);
 
-			Rect2 rect(position, slot_size);
-			Point2i key(col, row);
+			const Point2i pos(x, y);
+			const Rect2i rect(pos, slot_size);
+			const Point2i key(col, row);
 
-			cells[key] = rect;
+			Slot value;
+			value.rect = rect;
+
+			cells[key] = value;
 		}
 	}
-	queue_grid_redraw();
+	update_minimum_size();
+	queue_redraw();
 }
-
-void GridInventory::_draw_slot(Point2i p_key, State p_new_state) {
-	const RID ci = get_canvas_item();
-
-	if (cells.has(p_key)) {
-		if (p_new_state == HOVER && item_frame_hover.is_valid()) {
-			item_frame_hover->draw(ci, cells[p_key]);
-		} else if (p_new_state == State::DEFAULT && item_frame.is_valid()) {
-			item_frame->draw(ci, cells[p_key]);
-		}
+void GridInventory::_flush_hover_if_needed() {
+	if (selected_slot_key.x >= 0 && selected_slot_key.y >= 0) {
+		cells[selected_slot_key].state = State::DEFAULT;
+		selected_slot_key = Point2i(-1, -1);
+		queue_redraw();
 	}
-	pending_slot_redraw.is_valid = false;
 }
 
 void GridInventory::_notification(int p_what) {
@@ -251,16 +241,13 @@ void GridInventory::_notification(int p_what) {
 			// Godot clears the canvas on each redraw for Control nodes, so full redraw is always required.
 			_draw_background();
 			_draw_all_slots();
-
-			// Draw the hovered or updated slot over the grid
-			if (pending_slot_redraw.is_valid) {
-				_draw_slot(pending_slot_redraw.key, pending_slot_redraw.new_state);
-			}
 			break;
 		}
 		case NOTIFICATION_ENTER_TREE: {
 			// Generate grid on first-time setup
 			_generate_grid_rects();
+			update_minimum_size();
+			queue_redraw();
 
 			auto callable = callable_mp(this, &GridInventory::_mouse_exited);
 			if (!is_connected("mouse_exited", callable)) {
