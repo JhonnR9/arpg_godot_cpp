@@ -1,8 +1,9 @@
+ColorRect
+TextureRect
 CanvasLayer
 GridInventory
 BoxContainer
 Control
-TextureRect
 Node2D
 Panel
 Label
@@ -11,5 +12,3 @@ AspectRatioContainer
 HBoxContainer
 PanelContainer
 FlowContainer
-Container
-GridContainer

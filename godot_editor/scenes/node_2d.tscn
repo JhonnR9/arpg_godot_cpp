@@ -814,7 +814,7 @@ drag_vertical_enabled = true
 
 [node name="Iventory" parent="CanvasLayer" instance=ExtResource("20_k6u5g")]
 size_flags_horizontal = 0
-size_flags_vertical = 4
+size_flags_vertical = 8
 
 [connection signal="direction_name_changed" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_direction_name_changed"]
 [connection signal="start_move" from="FloatingCharacter2D" to="FloatingCharacter2D/AnimationController" method="_on_floating_character_2d_start_move"]

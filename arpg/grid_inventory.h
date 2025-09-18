@@ -1,9 +1,12 @@
 #pragma once
 #include "godot_cpp/classes/control.hpp"
 #include "godot_cpp/classes/style_box.hpp"
+#include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/templates/hash_map.hpp"
 
 namespace godot {
+
+#define INVALID_KEY -1
 
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
@@ -14,28 +17,30 @@ class GridInventory final : public Control {
 
 	enum State {
 		HOVER,
-		DEFAULT
+		NORMAL
 	};
 
 	struct Slot {
-		State state = DEFAULT;
+		State state = NORMAL;
 		Rect2i rect;
 		Ref<Texture2D> item_texture;
 		int item_amount = 0;
 	};
 
-	Point2i selected_slot_key = Point2i(-1, -1);
+	int64_t hovered_slot_key = INVALID_KEY;
+	int64_t selected_slot_key = INVALID_KEY;
 
 	int rows = 4;
 	int columns = 8;
 	Size2 slot_size = Vector2(16, 16);
-	HashMap<Point2i, Slot> cells;
+	HashMap<int64_t, Slot> cells;
 	Size2i slot_margin = Vector2(2, 2);
 	Size2i grid_padding = Vector2(4, 4);
+	TextureRect *drag_preview = nullptr;
 
 	void _draw_background();
 	void _draw_all_slots();
-	Point2i _get_cell_key(Point2i point) const;
+	int64_t _get_key_from_position(Point2i point) const;
 	void _generate_grid_rects();
 	void _flush_hover_if_needed();
 
@@ -43,13 +48,21 @@ class GridInventory final : public Control {
 		Ref<StyleBox> normal;
 	} theme_cache;
 
+	static int64_t _make_cell_key(const int col, const int row) {
+		return (static_cast<int64_t>(col) << 32) | static_cast<uint32_t>(row);
+	}
+	static int _get_col_from_key(const int64_t key) {
+		return static_cast<int>(key >> 32);
+	}
+	static int _get_row_from_key(const int64_t key) {
+		return static_cast<int>(key & 0xFFFFFFFF);
+	}
+
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 
 public:
-	GridInventory()=default;
-
 	Ref<StyleBox> get_background() const;
 	void set_background(const Ref<StyleBox> &p_background);
 
