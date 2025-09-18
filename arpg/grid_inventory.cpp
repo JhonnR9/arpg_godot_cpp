@@ -14,20 +14,16 @@
 using namespace godot;
 AUTO_REGISTER_CLASS(GridInventory)
 
-// --- StyleBox Getters/Setters ---
 inline Ref<StyleBox> GridInventory::get_background() const {
 	return background;
 }
 void GridInventory::set_background(const Ref<StyleBox> &p_background) {
-	_disconnect_signals(background); // Avoid duplicate connections
-	_connect_signals(p_background); // React to style changes
+	_disconnect_signals(background);
+	_connect_signals(p_background);
 	this->background = p_background;
-	queue_redraw(); // Force UI update
+	queue_redraw();
 }
 
-inline Ref<StyleBox> GridInventory::get_item_frame() const {
-	return item_frame;
-}
 void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame) {
 	_disconnect_signals(item_frame);
 	_connect_signals(p_item_frame);
@@ -35,9 +31,6 @@ void GridInventory::set_item_frame(const Ref<StyleBox> &p_item_frame) {
 	queue_redraw();
 }
 
-inline Ref<StyleBox> GridInventory::get_item_frame_hover() const {
-	return item_frame_hover;
-}
 void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_hover) {
 	_disconnect_signals(item_frame_hover);
 	_connect_signals(p_item_frame_hover);
@@ -45,49 +38,32 @@ void GridInventory::set_item_frame_hover(const Ref<StyleBox> &p_item_frame_hover
 	queue_redraw();
 }
 
-// --- Grid dimension setters ---
-inline int GridInventory::get_rows() const {
-	return rows;
-}
 void GridInventory::set_rows(int p_rows) {
 	rows = p_rows;
-	_generate_grid_rects(); // Recalculate layout when rows change
+	_generate_grid_rects();
 }
 
-inline int GridInventory::get_columns() const {
-	return columns;
-}
 void GridInventory::set_columns(int p_columns) {
 	columns = p_columns;
-	_generate_grid_rects(); // Recalculate layout when columns change
+	_generate_grid_rects();
 }
 
-// --- Slot layout configuration ---
-inline Size2i GridInventory::get_slot_size() const {
-	return slot_size;
-}
 void GridInventory::set_slot_size(const Size2i &p_slot_size) {
 	slot_size = p_slot_size;
 	_generate_grid_rects();
 }
 
-inline Size2i GridInventory::get_slot_margin() const {
-	return slot_margin;
-}
 void GridInventory::set_slot_margin(const Size2i &p_slot_margin) {
 	slot_margin = p_slot_margin;
 	_generate_grid_rects();
 }
 
-inline Size2i GridInventory::get_grid_padding() const {
-	return grid_padding;
-}
+
 void GridInventory::set_grid_padding(const Size2i &p_grid_padding) {
 	grid_padding = p_grid_padding;
 	_generate_grid_rects();
 }
 
-// --- Minimum container size based on grid ---
 Size2 GridInventory::_get_minimum_size() const {
 	const int total_width = grid_padding.x * 2 + columns * slot_size.x + (columns - 1) * slot_margin.x;
 	const int total_height = grid_padding.y * 2 + rows * slot_size.y + (rows - 1) * slot_margin.y;
@@ -95,7 +71,6 @@ Size2 GridInventory::_get_minimum_size() const {
 	return Size2(total_width, total_height);
 }
 
-// --- Main input handling (hover, click, drag) ---
 void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 	Control::_gui_input(p_event);
 
@@ -104,18 +79,18 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 	}
 
 	// Handle drag preview visibility
-	if (selected_slot_key == INVALID_KEY) {
-		if (drag_preview != nullptr) {
+	if (selected_slot_key != INVALID_KEY) {
+		if (drag_preview) {
 			drag_preview->set_position(get_local_mouse_position() - (slot_size / 2));
 			drag_preview->set_visible(true);
 		}
 	} else {
-		if (drag_preview != nullptr) {
+		if (drag_preview) {
 			drag_preview->set_visible(false);
 		}
 	}
 
-	// --- Mouse motion: detect hovered slot ---
+	// Mouse motion: detect hovered slot
 	if (Ref<InputEventMouseMotion> motion = p_event; motion.is_valid()) {
 		const Point2i pos = motion->get_position();
 		const int64_t key = _get_key_from_position(pos);
@@ -139,7 +114,7 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		}
 	}
 
-	// --- Mouse button: select slot or drop item ---
+	// Mouse button: select slot or drop item
 	if (Ref<InputEventMouseButton> mouse_btn = p_event; mouse_btn.is_valid()) {
 		if (mouse_btn->is_pressed()) {
 			const Point2i pos = mouse_btn->get_position();
@@ -169,7 +144,7 @@ void GridInventory::_on_style_changed() {
 	queue_redraw(); // Refresh when styles update
 }
 
-// --- Connect/disconnect signals for StyleBox updates ---
+
 void GridInventory::_connect_signals(const Ref<StyleBox> &p_style) {
 	const auto callable = callable_mp(this, &GridInventory::_on_style_changed);
 	if (p_style.is_valid() && !p_style->is_connected("changed", callable)) {
@@ -183,7 +158,7 @@ void GridInventory::_disconnect_signals(const Ref<StyleBox> &p_style) {
 	}
 }
 
-// --- Custom drawing ---
+
 void GridInventory::_draw_background() {
 	if (!background.is_valid()) {
 		return;
@@ -194,14 +169,10 @@ void GridInventory::_draw_background() {
 }
 
 void GridInventory::_draw_all_slots() {
-	if (item_frame.is_null() || item_frame_hover.is_null()) {
-		return;
-	}
-
 	const RID ci = get_canvas_item();
 	for (const KeyValue<int64_t, Slot> &kv : cells) {
 		const Slot &slot = kv.value;
-		// Draw hovered or normal slot frame
+
 		if (slot.state == State::HOVER && item_frame_hover.is_valid()) {
 			item_frame_hover->draw(ci, slot.rect);
 		} else if (slot.state == State::NORMAL && item_frame.is_valid()) {
@@ -210,7 +181,6 @@ void GridInventory::_draw_all_slots() {
 	}
 }
 
-// --- Utility: get slot index from mouse position ---
 int64_t GridInventory::_get_key_from_position(const Point2i point) const {
 	const Point2i adjust_point = point - grid_padding;
 	if (adjust_point.x < 0 || adjust_point.y < 0) {
@@ -234,7 +204,6 @@ int64_t GridInventory::_get_key_from_position(const Point2i point) const {
 	return INVALID_KEY;
 }
 
-// --- Build slot rectangles based on rows/columns ---
 void GridInventory::_generate_grid_rects() {
 	cells.clear();
 
@@ -267,7 +236,6 @@ void GridInventory::_generate_grid_rects() {
 	queue_redraw();
 }
 
-// --- Reset hover if mouse moved away ---
 void GridInventory::_flush_hover_if_needed() {
 	if (hovered_slot_key != INVALID_KEY) {
 		if (Slot *slot = cells.getptr(hovered_slot_key)) {
@@ -278,7 +246,6 @@ void GridInventory::_flush_hover_if_needed() {
 	}
 }
 
-// --- Handle Godot notifications ---
 void GridInventory::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_DRAW:
@@ -291,7 +258,6 @@ void GridInventory::_notification(int p_what) {
 			update_minimum_size();
 			queue_redraw();
 
-			// Connect to style change signals
 			_connect_signals(item_frame);
 			_connect_signals(item_frame_hover);
 
@@ -316,7 +282,6 @@ void GridInventory::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_EXIT_TREE: {
-			// Clean up signals when leaving scene tree
 			const auto callable = callable_mp(this, &GridInventory::_mouse_exited);
 			_disconnect_signals(item_frame);
 			_disconnect_signals(item_frame_hover);
@@ -340,8 +305,13 @@ void GridInventory::_notification(int p_what) {
 			break;
 	}
 }
+void GridInventory::add_item(Ref<ItemView> item, Point2i point) {
 
-// --- Godot class binding ---
+}
+void GridInventory::add_item() {
+
+}
+
 void GridInventory::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_background"), &GridInventory::get_background);
 	ClassDB::bind_method(D_METHOD("set_background", "background"), &GridInventory::set_background);
@@ -367,7 +337,6 @@ void GridInventory::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_grid_padding"), &GridInventory::get_grid_padding);
 	ClassDB::bind_method(D_METHOD("set_grid_padding", "grid_padding"), &GridInventory::set_grid_padding);
 
-	// --- Exposed properties in Godot Editor ---
 	ADD_SUBGROUP("Styles", "");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "background", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Background"), "set_background", "get_background");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame"), "set_item_frame", "get_item_frame");

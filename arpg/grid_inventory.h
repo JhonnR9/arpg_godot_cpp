@@ -2,11 +2,13 @@
 #include "godot_cpp/classes/control.hpp"
 #include "godot_cpp/classes/style_box.hpp"
 #include "godot_cpp/classes/texture_rect.hpp"
+#include "item_view.h"
 #include "godot_cpp/templates/hash_map.hpp"
 
 namespace godot {
 
 #define INVALID_KEY -1
+#define INVALID_ID -1
 
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
@@ -23,8 +25,7 @@ class GridInventory final : public Control {
 	struct Slot {
 		State state = NORMAL;
 		Rect2i rect;
-		Ref<Texture2D> item_texture;
-		int item_amount = 0;
+		Ref<ItemView> item;
 	};
 
 	int64_t hovered_slot_key = INVALID_KEY;
@@ -63,28 +64,46 @@ protected:
 	void _notification(int p_what);
 
 public:
+
+	void add_item(Ref<ItemView> item, Point2i point);
+	void add_item();
+
 	Ref<StyleBox> get_background() const;
 	void set_background(const Ref<StyleBox> &p_background);
 
-	Ref<StyleBox> get_item_frame() const;
+	Ref<StyleBox> get_item_frame() const {
+		return item_frame;
+	}
 	void set_item_frame(const Ref<StyleBox> &p_item_frame);
 
-	Ref<StyleBox> get_item_frame_hover() const;
+	Ref<StyleBox> get_item_frame_hover() const {
+		return item_frame_hover;
+	}
 	void set_item_frame_hover(const Ref<StyleBox> &p_item_frame_hover);
 
-	int get_rows() const;
+	int get_rows() const {
+		return rows;
+	}
 	void set_rows(int p_rows);
 
-	int get_columns() const;
+	int get_columns() const {
+		return columns;
+	}
 	void set_columns(int p_columns);
 
-	Size2i get_slot_size() const;
+	Size2i get_slot_size() const {
+		return slot_size;
+	}
 	void set_slot_size(const Size2i &p_slot_size);
 
-	Size2i get_slot_margin() const;
+	Size2i get_slot_margin() const {
+		return slot_margin;
+	}
 	void set_slot_margin(const Size2i &p_slot_margin);
 
-	Size2i get_grid_padding() const;
+	Size2i get_grid_padding() const {
+		return grid_padding;
+	}
 	void set_grid_padding(const Size2i &p_grid_padding);
 
 	Size2 _get_minimum_size() const override;
