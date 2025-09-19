@@ -1,12 +1,15 @@
 #include "grid_inventory.h"
 
 #include "godot_cpp/classes/color_rect.hpp"
+#include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/input_event.hpp"
 #include "godot_cpp/classes/input_event_mouse_button.hpp"
 #include "godot_cpp/classes/input_event_mouse_motion.hpp"
+#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/classes/theme.hpp"
 #include "godot_cpp/classes/theme_db.hpp"
+#include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/templates/pair.hpp"
 #include "tools/auto_resgister.h"
 #include <godot_cpp/classes/resource_loader.hpp>
@@ -77,12 +80,13 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		return;
 	}
 
-	// Handle drag preview visibility
 	if (selected_slot_key != INVALID_KEY) {
-		if (drag_preview) {
-			drag_preview->set_position(get_local_mouse_position() - (slot_size / 2));
-			drag_preview->set_visible(true);
+		const uint64_t current_time = Time::get_singleton()->get_ticks_msec();
+		constexpr uint64_t start_drag_delay_ms = 100.0;
+		if (current_time - start_click_time > start_drag_delay_ms ) {
+			_star_drag();
 		}
+
 	} else {
 		if (drag_preview) {
 			drag_preview->set_visible(false);
@@ -90,7 +94,7 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 	}
 
 	// Mouse motion: detect hovered slot
-	if (Ref<InputEventMouseMotion> motion = p_event; motion.is_valid()) {
+	if (const Ref<InputEventMouseMotion> motion = p_event; motion.is_valid()) {
 		const Point2i pos = motion->get_position();
 		const int64_t key = _get_key_from_position(pos);
 
@@ -114,20 +118,24 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 	}
 
 	// Mouse button: select slot or drop item
-	if (Ref<InputEventMouseButton> mouse_btn = p_event; mouse_btn.is_valid()) {
+	if (const Ref<InputEventMouseButton> mouse_btn = p_event; mouse_btn.is_valid()) {
 		if (mouse_btn->is_pressed()) {
 			const Point2i pos = mouse_btn->get_position();
 			const int64_t key = _get_key_from_position(pos);
 
-			if (Slot *slot = cells.getptr(key)) {
+			if (const Slot *slot = cells.getptr(key)) {
 				if (drag_preview != nullptr) {
 					if (drag_preview->is_visible()) {
 						// Drop dragged item into slot
-						drag_preview->set_position(slot->rect.position);
+						const auto slot_position = Point2i(_get_col_from_key(key), _get_row_from_key(key));
+						add_item_at(drag_item, slot_position);
+						drag_item.unref();
 						selected_slot_key = INVALID_KEY;
+
 					} else {
-						// Pick up item from slot
+						// start check if you can drag and select it
 						selected_slot_key = key;
+						start_click_time = Time::get_singleton()->get_ticks_msec();
 					}
 				}
 			}
@@ -180,6 +188,7 @@ void GridInventory::_draw_all_slots() {
 
 int64_t GridInventory::_get_key_from_position(const Point2i point) const {
 	const Point2i adjust_point = point - grid_padding;
+
 	if (adjust_point.x < 0 || adjust_point.y < 0) {
 		return INVALID_KEY;
 	}
@@ -195,11 +204,18 @@ int64_t GridInventory::_get_key_from_position(const Point2i point) const {
 	const int cell_y = adjust_point.y / cell_height;
 
 	const int64_t key = _make_cell_key(cell_x, cell_y);
-	if (const Slot *slot = cells.getptr(key); slot && slot->rect.has_point(adjust_point)) {
-		return key;
+	const Slot *slot = cells.getptr(key);
+
+	if (slot) {
+		const Point2i local_pos = point;
+		if (slot->rect.has_point(local_pos)) {
+			return key;
+		}
 	}
+
 	return INVALID_KEY;
 }
+
 
 void GridInventory::_generate_grid_rects() {
 	cells.clear();
@@ -242,6 +258,7 @@ void GridInventory::_flush_hover_if_needed() {
 		queue_redraw();
 	}
 }
+
 void GridInventory::_update_item_icon(Slot &slot) {
 	if (slot.item.is_null()) {
 		return;
@@ -261,7 +278,38 @@ void GridInventory::_update_item_icon(Slot &slot) {
 	slot.texture_rect->set_size(slot_size);
 	slot.texture_rect->set_pivot_offset(slot_size * 0.5);
 	slot.texture_rect->set_position(slot.rect.get_position());
+}
+void GridInventory::_star_drag() {
+	if (drag_preview) {
+		const Point2i mouse_pos = get_local_mouse_position();
+		drag_preview->set_position(mouse_pos - (slot_size / 2));
+		drag_preview->set_visible(true);
 
+		const int64_t key = _get_key_from_position(mouse_pos);
+
+		if (cells.has(key) && cells[key].item.is_valid()) {
+			Slot *slot = cells.getptr(key);
+
+			if (slot->item.is_valid()) {
+				drag_item = slot->item;
+				const Ref<Texture2D> texture = slot->item->get_icon();
+				_clear_slot(*slot); // clear slot before drag
+
+				// need recalculate size when texture changed
+				drag_preview->set_texture(texture);
+				drag_preview->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
+				drag_preview->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
+				drag_preview->set_size(slot_size);
+				drag_preview->set_pivot_offset(slot_size * 0.5);
+			}
+
+		}
+	}
+}
+void GridInventory::_clear_slot(Slot &p_slot) {
+	p_slot.texture_rect->queue_free();
+	p_slot.texture_rect = nullptr;
+	p_slot.item.unref(); // clear slot before drag
 }
 
 void GridInventory::_notification(int p_what) {
@@ -280,21 +328,15 @@ void GridInventory::_notification(int p_what) {
 			_connect_signals(item_frame_hover);
 
 			// Track when mouse exits control
-			auto callable = callable_mp(this, &GridInventory::_mouse_exited);
+			const auto callable = callable_mp(this, &GridInventory::_mouse_exited);
 			if (!is_connected("mouse_exited", callable)) {
 				this->connect("mouse_exited", callable);
 			}
 
 			// Initialize drag preview (temporary item being moved)
-			const auto res = ResourceLoader::get_singleton()->load("uid://cyp1n8fi003in");
-			drag_preview = memnew(TextureRect);
+			drag_preview = memnew(TextureRect); // don't need manager memory godot make this in scene_tree
 			if (drag_preview != nullptr) {
-				drag_preview->set_texture(res);
 				add_child(drag_preview);
-				drag_preview->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
-				drag_preview->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
-				drag_preview->set_size(slot_size);
-				drag_preview->set_pivot_offset(slot_size * 0.5);
 				drag_preview->set_visible(false);
 			}
 			break;
@@ -348,7 +390,6 @@ bool GridInventory::add_item_at(Ref<ItemView> p_item, Point2i p_point) {
 		}
 
 		// TODO swap item drag
-
 	}
 
 	return false;

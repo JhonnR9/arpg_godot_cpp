@@ -31,6 +31,7 @@ class GridInventory final : public Control {
 
 	int64_t hovered_slot_key = INVALID_KEY;
 	int64_t selected_slot_key = INVALID_KEY;
+	uint64_t start_click_time = 0.0;
 
 	int rows = 4;
 	int columns = 8;
@@ -39,6 +40,7 @@ class GridInventory final : public Control {
 	Size2i slot_margin = Vector2(2, 2);
 	Size2i grid_padding = Vector2(4, 4);
 	TextureRect *drag_preview = nullptr;
+	Ref<ItemView> drag_item;
 
 	void _draw_background();
 	void _draw_all_slots();
@@ -46,6 +48,8 @@ class GridInventory final : public Control {
 	void _generate_grid_rects();
 	void _flush_hover_if_needed();
 	void _update_item_icon(Slot & slot);
+	void _star_drag();
+	static void _clear_slot(Slot& p_slot);
 
 	struct {
 		Ref<StyleBox> normal;
