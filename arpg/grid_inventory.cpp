@@ -58,7 +58,6 @@ void GridInventory::set_slot_margin(const Size2i &p_slot_margin) {
 	_generate_grid_rects();
 }
 
-
 void GridInventory::set_grid_padding(const Size2i &p_grid_padding) {
 	grid_padding = p_grid_padding;
 	_generate_grid_rects();
@@ -144,7 +143,6 @@ void GridInventory::_on_style_changed() {
 	queue_redraw(); // Refresh when styles update
 }
 
-
 void GridInventory::_connect_signals(const Ref<StyleBox> &p_style) {
 	const auto callable = callable_mp(this, &GridInventory::_on_style_changed);
 	if (p_style.is_valid() && !p_style->is_connected("changed", callable)) {
@@ -157,7 +155,6 @@ void GridInventory::_disconnect_signals(const Ref<StyleBox> &p_style) {
 		p_style->disconnect("changed", callable);
 	}
 }
-
 
 void GridInventory::_draw_background() {
 	if (!background.is_valid()) {
@@ -305,11 +302,55 @@ void GridInventory::_notification(int p_what) {
 			break;
 	}
 }
-void GridInventory::add_item(Ref<ItemView> item, Point2i point) {
+bool GridInventory::add_item(Ref<ItemView> p_item, Point2i p_point) {
+	const auto key = _get_key_from_position(p_point);
+	const bool has_key = cells.has(key);
 
+	if (!has_key) {
+		ERR_PRINT(vformat("Slot at (%d, %d) does not exist. Cannot add item: %s", p_point.x, p_point.y, p_item->get_name()));
+		return false;
+	}
+
+	if (Slot *slot = cells.getptr(key)) {
+		if (slot->item.is_null()) {
+			slot->item = p_item;
+			return true;
+		}
+
+		if (slot->item->get_id() == p_item->get_id()) {
+			const int current_amount = slot->item->get_item_amount();
+			const int incoming_amount = p_item->get_item_amount();
+			slot->item->set_item_amount(current_amount + incoming_amount);
+			return true;
+		}
+
+		// TODO swap item drag
+
+	}
+
+	return false;
 }
-void GridInventory::add_item() {
+bool GridInventory::add_item(Ref<ItemView> p_item) {
+	if (p_item.is_null()) {
+		return false;
+	}
 
+	int64_t key = INVALID_KEY;
+	for (const KeyValue<int64_t, Slot> &kv : cells) {
+		if (kv.value.item.is_null()) {
+			key = kv.key;
+			break;
+		}
+	}
+
+	if (key != INVALID_KEY) {
+		if (Slot *slot = cells.getptr(key)) {
+			slot->item = p_item;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void GridInventory::_bind_methods() {

@@ -65,8 +65,8 @@ protected:
 
 public:
 
-	void add_item(Ref<ItemView> item, Point2i point);
-	void add_item();
+	bool add_item(Ref<ItemView> p_item, Point2i p_point);
+	bool add_item(Ref<ItemView> p_item);
 
 	Ref<StyleBox> get_background() const;
 	void set_background(const Ref<StyleBox> &p_background);
