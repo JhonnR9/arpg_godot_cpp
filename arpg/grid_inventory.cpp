@@ -242,6 +242,27 @@ void GridInventory::_flush_hover_if_needed() {
 		queue_redraw();
 	}
 }
+void GridInventory::_update_item_icon(Slot &slot) {
+	if (slot.item.is_null()) {
+		return;
+	}
+	if (slot.item->get_icon().is_null()) {
+		return;
+	}
+
+	if (!slot.texture_rect) {
+		slot.texture_rect = memnew(TextureRect); // use TextureRect for don't redraw all grid
+		add_child(slot.texture_rect);
+	}
+
+	slot.texture_rect->set_texture(slot.item->get_icon());
+	slot.texture_rect->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
+	slot.texture_rect->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
+	slot.texture_rect->set_size(slot_size);
+	slot.texture_rect->set_pivot_offset(slot_size * 0.5);
+	slot.texture_rect->set_position(slot.rect.get_position());
+
+}
 
 void GridInventory::_notification(int p_what) {
 	switch (p_what) {
@@ -302,8 +323,8 @@ void GridInventory::_notification(int p_what) {
 			break;
 	}
 }
-bool GridInventory::add_item(Ref<ItemView> p_item, Point2i p_point) {
-	const auto key = _get_key_from_position(p_point);
+bool GridInventory::add_item_at(Ref<ItemView> p_item, Point2i p_point) {
+	const auto key = _make_cell_key(p_point.x, p_point.y);
 	const bool has_key = cells.has(key);
 
 	if (!has_key) {
@@ -314,6 +335,8 @@ bool GridInventory::add_item(Ref<ItemView> p_item, Point2i p_point) {
 	if (Slot *slot = cells.getptr(key)) {
 		if (slot->item.is_null()) {
 			slot->item = p_item;
+			// setup icon
+			_update_item_icon(*slot);
 			return true;
 		}
 
@@ -346,6 +369,8 @@ bool GridInventory::add_item(Ref<ItemView> p_item) {
 	if (key != INVALID_KEY) {
 		if (Slot *slot = cells.getptr(key)) {
 			slot->item = p_item;
+			UtilityFunctions::print(p_item->get_name());
+			_update_item_icon(*slot);
 			return true;
 		}
 	}
@@ -377,6 +402,9 @@ void GridInventory::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_grid_padding"), &GridInventory::get_grid_padding);
 	ClassDB::bind_method(D_METHOD("set_grid_padding", "grid_padding"), &GridInventory::set_grid_padding);
+
+	ClassDB::bind_method(D_METHOD("add_item", "item"), &GridInventory::add_item);
+	ClassDB::bind_method(D_METHOD("add_item_at", "item", "point"), &GridInventory::add_item_at);
 
 	ADD_SUBGROUP("Styles", "");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "background", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Background"), "set_background", "get_background");

@@ -1,4 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://g5r1otrefvmf"]
+[gd_scene load_steps=6 format=3 uid="uid://g5r1otrefvmf"]
+
+[ext_resource type="Script" uid="uid://2tfsjdgogev" path="res://grid_inventory.gd" id="1_0anj3"]
+[ext_resource type="Texture2D" uid="uid://cyp1n8fi003in" path="res://Sprites/icon1.png" id="2_f542o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
 bg_color = Color(0.2784, 0.29856, 0.48, 1)
@@ -66,3 +69,5 @@ slot_margin = Vector2i(1, 1)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
+script = ExtResource("1_0anj3")
+texture = ExtResource("2_f542o")

@@ -26,6 +26,7 @@ class GridInventory final : public Control {
 		State state = NORMAL;
 		Rect2i rect;
 		Ref<ItemView> item;
+		TextureRect *texture_rect = nullptr;
 	};
 
 	int64_t hovered_slot_key = INVALID_KEY;
@@ -44,6 +45,7 @@ class GridInventory final : public Control {
 	int64_t _get_key_from_position(Point2i point) const;
 	void _generate_grid_rects();
 	void _flush_hover_if_needed();
+	void _update_item_icon(Slot & slot);
 
 	struct {
 		Ref<StyleBox> normal;
@@ -65,7 +67,7 @@ protected:
 
 public:
 
-	bool add_item(Ref<ItemView> p_item, Point2i p_point);
+	bool add_item_at(Ref<ItemView> p_item, Point2i p_point);
 	bool add_item(Ref<ItemView> p_item);
 
 	Ref<StyleBox> get_background() const;
