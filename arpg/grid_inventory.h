@@ -17,13 +17,18 @@ class GridInventory final : public Control {
 	Ref<StyleBox> item_frame;
 	Ref<StyleBox> item_frame_hover;
 
-	enum State {
+	enum SlotState {
 		HOVER,
 		NORMAL
 	};
+	enum DragState {
+		REQUESTED,
+		DRAGGING,
+		STOPED
+	};
 
 	struct Slot {
-		State state = NORMAL;
+		SlotState state = NORMAL;
 		Rect2i rect;
 		Ref<ItemView> item;
 		TextureRect *texture_rect = nullptr;
@@ -32,6 +37,7 @@ class GridInventory final : public Control {
 	int64_t hovered_slot_key = INVALID_KEY;
 	int64_t selected_slot_key = INVALID_KEY;
 	uint64_t start_click_time = 0.0;
+	DragState drag_state = STOPED;
 
 	int rows = 4;
 	int columns = 8;
@@ -48,7 +54,7 @@ class GridInventory final : public Control {
 	void _generate_grid_rects();
 	void _flush_hover_if_needed();
 	void _update_item_icon(Slot & slot);
-	void _star_drag();
+	void _start_drag();
 	static void _clear_slot(Slot& p_slot);
 
 	struct {

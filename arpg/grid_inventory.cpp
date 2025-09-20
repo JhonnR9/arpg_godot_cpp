@@ -80,16 +80,41 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		return;
 	}
 
-	if (selected_slot_key != INVALID_KEY) {
-		const uint64_t current_time = Time::get_singleton()->get_ticks_msec();
-		constexpr uint64_t start_drag_delay_ms = 100.0;
-		if (current_time - start_click_time > start_drag_delay_ms ) {
-			_star_drag();
-		}
+	// Mouse button: pickup item or drop item
+	if (const Ref<InputEventMouseButton> mouse_btn = p_event; mouse_btn.is_valid()) {
+		const Point2i pos = mouse_btn->get_position();
+		const int64_t key = _get_key_from_position(pos);
 
-	} else {
-		if (drag_preview) {
-			drag_preview->set_visible(false);
+		if (mouse_btn->is_pressed()) {
+			if (drag_preview  && drag_state == STOPED) {
+				if (cells.has(key)) {
+					// start check if you can drag and select it
+					selected_slot_key = key;
+					start_click_time = Time::get_singleton()->get_ticks_msec();
+					drag_state = REQUESTED;
+					UtilityFunctions::print("REQUESTED");
+					set_process(true);
+				}
+
+			}
+		} else if (mouse_btn->is_released()) {
+			Slot *slot = cells.getptr(key);
+
+			if (drag_state == DRAGGING && cells.has(key) && slot && drag_item.is_valid()) {
+				// Drop dragged item into slot
+				slot->item = drag_item;
+				_update_item_icon(*slot);
+				drag_item.unref();
+				selected_slot_key = INVALID_KEY;
+				start_click_time = 0;
+				drag_state = STOPED;
+				set_process(false);
+				UtilityFunctions::print("STOPED");
+
+				if (drag_preview) {
+					drag_preview->set_visible(false);
+				}
+			}
 		}
 	}
 
@@ -99,46 +124,20 @@ void GridInventory::_gui_input(const Ref<InputEvent> &p_event) {
 		const int64_t key = _get_key_from_position(pos);
 
 		if (Slot *slot = cells.getptr(key)) {
-			if (key == hovered_slot_key) {
-				return;
+			if (key != hovered_slot_key) {
+				// Reset previous slot state
+				if (Slot *prev_slot = cells.getptr(hovered_slot_key)) {
+					prev_slot->state = SlotState::NORMAL;
+				}
+
+				// Highlight new slot
+				slot->state = SlotState::HOVER;
+				hovered_slot_key = key;
+				queue_redraw();
 			}
 
-			// Reset previous slot state
-			if (Slot *prev_slot = cells.getptr(hovered_slot_key)) {
-				prev_slot->state = State::NORMAL;
-			}
-
-			// Highlight new slot
-			slot->state = State::HOVER;
-			hovered_slot_key = key;
-			queue_redraw();
 		} else {
 			_flush_hover_if_needed(); // Clear hover if outside grid
-		}
-	}
-
-	// Mouse button: select slot or drop item
-	if (const Ref<InputEventMouseButton> mouse_btn = p_event; mouse_btn.is_valid()) {
-		if (mouse_btn->is_pressed()) {
-			const Point2i pos = mouse_btn->get_position();
-			const int64_t key = _get_key_from_position(pos);
-
-			if (const Slot *slot = cells.getptr(key)) {
-				if (drag_preview != nullptr) {
-					if (drag_preview->is_visible()) {
-						// Drop dragged item into slot
-						const auto slot_position = Point2i(_get_col_from_key(key), _get_row_from_key(key));
-						add_item_at(drag_item, slot_position);
-						drag_item.unref();
-						selected_slot_key = INVALID_KEY;
-
-					} else {
-						// start check if you can drag and select it
-						selected_slot_key = key;
-						start_click_time = Time::get_singleton()->get_ticks_msec();
-					}
-				}
-			}
 		}
 	}
 }
@@ -178,9 +177,9 @@ void GridInventory::_draw_all_slots() {
 	for (const KeyValue<int64_t, Slot> &kv : cells) {
 		const Slot &slot = kv.value;
 
-		if (slot.state == State::HOVER && item_frame_hover.is_valid()) {
+		if (slot.state == SlotState::HOVER && item_frame_hover.is_valid()) {
 			item_frame_hover->draw(ci, slot.rect);
-		} else if (slot.state == State::NORMAL && item_frame.is_valid()) {
+		} else if (slot.state == SlotState::NORMAL && item_frame.is_valid()) {
 			item_frame->draw(ci, slot.rect);
 		}
 	}
@@ -215,7 +214,6 @@ int64_t GridInventory::_get_key_from_position(const Point2i point) const {
 
 	return INVALID_KEY;
 }
-
 
 void GridInventory::_generate_grid_rects() {
 	cells.clear();
@@ -252,7 +250,7 @@ void GridInventory::_generate_grid_rects() {
 void GridInventory::_flush_hover_if_needed() {
 	if (hovered_slot_key != INVALID_KEY) {
 		if (Slot *slot = cells.getptr(hovered_slot_key)) {
-			slot->state = State::NORMAL;
+			slot->state = SlotState::NORMAL;
 		}
 		hovered_slot_key = INVALID_KEY;
 		queue_redraw();
@@ -279,7 +277,9 @@ void GridInventory::_update_item_icon(Slot &slot) {
 	slot.texture_rect->set_pivot_offset(slot_size * 0.5);
 	slot.texture_rect->set_position(slot.rect.get_position());
 }
-void GridInventory::_star_drag() {
+void GridInventory::_start_drag() {
+	UtilityFunctions::print("DRAGGING");
+
 	if (drag_preview) {
 		const Point2i mouse_pos = get_local_mouse_position();
 		drag_preview->set_position(mouse_pos - (slot_size / 2));
@@ -302,7 +302,6 @@ void GridInventory::_star_drag() {
 				drag_preview->set_size(slot_size);
 				drag_preview->set_pivot_offset(slot_size * 0.5);
 			}
-
 		}
 	}
 }
@@ -348,6 +347,23 @@ void GridInventory::_notification(int p_what) {
 
 			if (is_connected("mouse_exited", callable)) {
 				this->disconnect("mouse_exited", callable);
+			}
+			break;
+		}
+		case NOTIFICATION_PROCESS: {
+			if (drag_state == DRAGGING && drag_preview) {
+				drag_preview->set_position(get_local_mouse_position() - (slot_size / 2));
+			}
+
+			if (drag_state == REQUESTED) {
+				const uint64_t current_time = Time::get_singleton()->get_ticks_msec();
+				constexpr uint64_t start_drag_delay_ms = 50.0;
+				UtilityFunctions::print(current_time - start_click_time);
+				if (current_time - start_click_time > start_drag_delay_ms) {
+					_start_drag();
+					drag_state = DRAGGING;
+					start_click_time = 0;
+				}
 			}
 			break;
 		}
