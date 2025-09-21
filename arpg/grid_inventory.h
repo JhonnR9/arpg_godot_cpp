@@ -1,43 +1,36 @@
 #pragma once
 #include "godot_cpp/classes/control.hpp"
+#include "godot_cpp/classes/panel.hpp"
 #include "godot_cpp/classes/style_box.hpp"
 #include "godot_cpp/classes/texture_rect.hpp"
-#include "item_view.h"
 #include "godot_cpp/templates/hash_map.hpp"
+#include "item_view.h"
 
 namespace godot {
 
 #define INVALID_KEY -1
 #define INVALID_ID -1
 
+
+
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
+
+	friend class SlotPanel;
 
 	Ref<StyleBox> background;
 	Ref<StyleBox> item_frame;
 	Ref<StyleBox> item_frame_hover;
 
-	enum SlotState {
-		HOVER,
-		NORMAL
-	};
-	enum DragState {
-		REQUESTED,
-		DRAGGING,
-		STOPED
-	};
-
 	struct Slot {
-		SlotState state = NORMAL;
 		Rect2i rect;
 		Ref<ItemView> item;
-		TextureRect *texture_rect = nullptr;
+		TextureRect *icon = nullptr;
+		SlotPanel* item_frame=nullptr;
 	};
 
 	int64_t hovered_slot_key = INVALID_KEY;
-	int64_t selected_slot_key = INVALID_KEY;
-	uint64_t start_click_time = 0.0;
-	DragState drag_state = STOPED;
+
 
 	int rows = 4;
 	int columns = 8;
@@ -45,21 +38,14 @@ class GridInventory final : public Control {
 	HashMap<int64_t, Slot> cells;
 	Size2i slot_margin = Vector2(2, 2);
 	Size2i grid_padding = Vector2(4, 4);
-	TextureRect *drag_preview = nullptr;
-	Ref<ItemView> drag_item;
 
 	void _draw_background();
-	void _draw_all_slots();
-	int64_t _get_key_from_position(Point2i point) const;
+	int64_t _get_key_from_position(Point2i pos) const;
 	void _generate_grid_rects();
-	void _flush_hover_if_needed();
 	void _update_item_icon(Slot & slot);
-	void _start_drag();
-	static void _clear_slot(Slot& p_slot);
-
-	struct {
-		Ref<StyleBox> normal;
-	} theme_cache;
+	void _on_slot_mouse_entered();
+	void _on_slot_mouse_exited();
+	static void _clear_slot(Slot &slot);
 
 	static int64_t _make_cell_key(const int col, const int row) {
 		return (static_cast<int64_t>(col) << 32) | static_cast<uint32_t>(row);
@@ -77,7 +63,7 @@ protected:
 
 public:
 
-	bool add_item_at(Ref<ItemView> p_item, Point2i p_point);
+	bool add_item_at(const Ref<ItemView> &p_item, Point2i p_point);
 	bool add_item(Ref<ItemView> p_item);
 
 	Ref<StyleBox> get_background() const;
@@ -116,14 +102,10 @@ public:
 	Size2i get_grid_padding() const {
 		return grid_padding;
 	}
+
 	void set_grid_padding(const Size2i &p_grid_padding);
-
 	Size2 _get_minimum_size() const override;
-
-	void _gui_input(const Ref<InputEvent> &p_event) override;
-	void _mouse_exited();
 	void _on_style_changed();
-
 	void _connect_signals(const Ref<StyleBox> &p_style);
 	void _disconnect_signals(const Ref<StyleBox> &p_style);
 };

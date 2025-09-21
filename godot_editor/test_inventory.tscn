@@ -16,7 +16,7 @@ corner_radius_bottom_left = 3
 anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
-bg_color = Color(0.147672, 0.147672, 0.147672, 1)
+bg_color = Color(0.123473, 0.123473, 0.123473, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -64,8 +64,9 @@ background = SubResource("StyleBoxFlat_ei5da")
 item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
 rows = 3
-columns = 7
-slot_margin = Vector2i(1, 1)
+columns = 6
+slot_size = Vector2i(14, 14)
+grid_padding = Vector2i(2, 2)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4

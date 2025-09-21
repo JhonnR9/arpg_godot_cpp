@@ -39,4 +39,28 @@
 	static CLASSNAME##AutoRegisterAbstract CLASSNAME##_auto_register_abstract_instance; \
 	}
 
+#define AUTO_REGISTER_INTERNAL_CLASS(CLASSNAME)                                         \
+	namespace {                                                                         \
+	struct CLASSNAME##AutoRegisterInternal {                                            \
+		CLASSNAME##AutoRegisterInternal() {                                             \
+			ClassRegistry::get().add_register_function([]() {                           \
+				GDREGISTER_INTERNAL_CLASS(CLASSNAME);                                   \
+			});                                                                         \
+		}                                                                               \
+	};                                                                                  \
+	static CLASSNAME##AutoRegisterInternal CLASSNAME##_auto_register_internal_instance; \
+	}
+
+#define AUTO_REGISTER_VIRTUAL_CLASS(CLASSNAME)                                        \
+	namespace {                                                                       \
+	struct CLASSNAME##AutoRegisterVirtual {                                           \
+		CLASSNAME##AutoRegisterVirtual() {                                            \
+			ClassRegistry::get().add_register_function([]() {                         \
+				GDREGISTER_VIRTUAL_CLASS(CLASSNAME);                                  \
+			});                                                                       \
+		}                                                                             \
+	};                                                                                \
+	static CLASSNAME##AutoRegisterVirtual CLASSNAME##_auto_register_virtual_instance; \
+	}
+
 #endif // AUTO_REGISTER_H

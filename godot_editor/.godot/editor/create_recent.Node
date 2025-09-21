@@ -1,3 +1,4 @@
+Panel
 ColorRect
 TextureRect
 CanvasLayer
@@ -5,7 +6,6 @@ GridInventory
 BoxContainer
 Control
 Node2D
-Panel
 Label
 MarginContainer
 AspectRatioContainer
