@@ -250,7 +250,7 @@ void GridInventory::_clear_slot(Slot &slot) {
 	}
 
 	if (slot.icon) {
-		slot.icon->hide();
+		slot.icon->queue_free();
 		slot.icon = nullptr;
 	}
 
