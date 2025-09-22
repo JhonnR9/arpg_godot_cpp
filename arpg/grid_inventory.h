@@ -1,6 +1,8 @@
 #pragma once
 #include "godot_cpp/classes/control.hpp"
+#include "godot_cpp/classes/label.hpp"
 #include "godot_cpp/classes/panel.hpp"
+#include "godot_cpp/classes/label_settings.hpp"
 #include "godot_cpp/classes/style_box.hpp"
 #include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/templates/hash_map.hpp"
@@ -11,8 +13,6 @@ namespace godot {
 #define INVALID_KEY -1
 #define INVALID_ID -1
 
-
-
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
 
@@ -21,16 +21,20 @@ class GridInventory final : public Control {
 	Ref<StyleBox> background;
 	Ref<StyleBox> item_frame;
 	Ref<StyleBox> item_frame_hover;
+	Ref<LabelSettings> count_label_settings;
 
+
+
+private:
 	struct Slot {
 		Rect2i rect;
 		Ref<ItemView> item;
 		TextureRect *icon = nullptr;
-		SlotPanel* item_frame=nullptr;
+		SlotPanel *item_frame = nullptr;
+		Label *count_label = nullptr;
 	};
 
 	int64_t hovered_slot_key = INVALID_KEY;
-
 
 	int rows = 4;
 	int columns = 8;
@@ -39,10 +43,11 @@ class GridInventory final : public Control {
 	Size2i slot_margin = Vector2(2, 2);
 	Size2i grid_padding = Vector2(4, 4);
 
+
 	void _draw_background();
 	int64_t _get_key_from_position(Point2i pos) const;
 	void _generate_grid_rects();
-	void _update_item_icon(Slot & slot);
+	void _sync_item_view(Slot &slot);
 	void _on_slot_mouse_entered();
 	void _on_slot_mouse_exited();
 	static void _clear_slot(Slot &slot);
@@ -62,9 +67,11 @@ protected:
 	void _notification(int p_what);
 
 public:
-
 	bool add_item_at(const Ref<ItemView> &p_item, Point2i p_point);
 	bool add_item(Ref<ItemView> p_item);
+
+	Ref<LabelSettings> get_count_label_settings() const { return count_label_settings; }
+	void set_count_label_settings(const Ref<LabelSettings> &p_count_label_settings);
 
 	Ref<StyleBox> get_background() const;
 	void set_background(const Ref<StyleBox> &p_background);
@@ -106,6 +113,7 @@ public:
 	void set_grid_padding(const Size2i &p_grid_padding);
 	Size2 _get_minimum_size() const override;
 	void _on_style_changed();
+	void _on_label_settings_style_changed();
 	void _connect_signals(const Ref<StyleBox> &p_style);
 	void _disconnect_signals(const Ref<StyleBox> &p_style);
 };

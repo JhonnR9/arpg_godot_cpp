@@ -1,14 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://g5r1otrefvmf"]
+[gd_scene load_steps=8 format=3 uid="uid://g5r1otrefvmf"]
 
 [ext_resource type="Script" uid="uid://2tfsjdgogev" path="res://grid_inventory.gd" id="1_0anj3"]
+[ext_resource type="FontFile" uid="uid://bdinlrfd0jr0n" path="res://resources/small_pixel.ttf" id="1_vdk5y"]
 [ext_resource type="Texture2D" uid="uid://cyp1n8fi003in" path="res://Sprites/icon1.png" id="2_f542o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
 bg_color = Color(0.2784, 0.29856, 0.48, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -17,10 +18,10 @@ anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
 bg_color = Color(0.123473, 0.123473, 0.123473, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(0.7396, 0.833913, 0.86, 1)
 corner_radius_top_left = 1
 corner_radius_top_right = 1
@@ -30,10 +31,10 @@ anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f542o"]
 bg_color = Color(0.227451, 0.227451, 0.227451, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(1, 0.383084, 0.115257, 1)
 corner_radius_top_left = 1
 corner_radius_top_right = 1
@@ -41,13 +42,22 @@ corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 anti_aliasing = false
 
+[sub_resource type="LabelSettings" id="LabelSettings_kh0vi"]
+font = ExtResource("1_vdk5y")
+font_size = 12
+font_color = Color(0.6195, 0.63, 0, 1)
+
 [node name="Iventory" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
+scale = Vector2(0.68, 0.68)
+pivot_offset = Vector2(0, -300)
 size_flags_horizontal = 4
 
 [node name="BoxContainer" type="BoxContainer" parent="."]
@@ -63,10 +73,11 @@ alignment = 1
 background = SubResource("StyleBoxFlat_ei5da")
 item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
+count_label_settings = SubResource("LabelSettings_kh0vi")
 rows = 3
-columns = 6
-slot_size = Vector2i(14, 14)
-grid_padding = Vector2i(2, 2)
+slot_size = Vector2i(32, 32)
+slot_margin = Vector2i(3, 3)
+grid_padding = Vector2i(6, 8)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4

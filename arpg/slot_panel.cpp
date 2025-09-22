@@ -18,7 +18,11 @@ void SlotPanel::_notification(int p_what) {
 		}
 		case NOTIFICATION_EXIT_TREE: {
 			inventory = nullptr;
-			memdelete(preview);
+
+			if (preview) {
+				memdelete(preview);
+			}
+
 			preview = nullptr;
 			break;
 		}
@@ -47,8 +51,8 @@ Variant SlotPanel::_get_drag_data(const Vector2 &p_at_position) {
 			preview->set_texture(slot->item->get_icon());
 			preview->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
 			preview->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
-			preview->set_size(slot->rect.size);
 			preview->set_pivot_offset(slot->rect.get_size() / 2);
+			preview->set_size(slot->rect.size);
 			preview->show();
 			set_drag_preview(preview);
 			preview = nullptr; //now godot can delete then
@@ -96,13 +100,13 @@ void SlotPanel::_drop_data(const Vector2 &p_at_position, const Variant &p_data) 
 	if (const auto *slot = inventory->cells.getptr(inventory->hovered_slot_key)) {
 		const Ref<ItemView> item = p_data;
 		if (item.is_valid()) {
-			if (slot->item.is_null()) {
-				const Point2i hovered_pos{
-					inventory->_get_col_from_key(inventory->hovered_slot_key),
-					inventory->_get_row_from_key(inventory->hovered_slot_key)
-				};
+			const Point2i hovered_pos{
+				inventory->_get_col_from_key(inventory->hovered_slot_key),
+				inventory->_get_row_from_key(inventory->hovered_slot_key)
+			};
 
-				inventory->add_item_at(item, hovered_pos);
+			if (!inventory->add_item_at(item, hovered_pos)) {
+				UtilityFunctions::print("Could not add item to destination slot.");
 			}
 		}
 	}
@@ -111,3 +115,4 @@ void SlotPanel::_drop_data(const Vector2 &p_at_position, const Variant &p_data) 
 		preview->hide();
 	}
 }
+

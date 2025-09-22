@@ -2,7 +2,8 @@
 
 #include "godot_cpp/classes/color_rect.hpp"
 #include "godot_cpp/classes/engine.hpp"
-#include "godot_cpp/classes/input.hpp"
+#include "godot_cpp/classes/font_file.hpp"
+#include "godot_cpp/classes/label_settings.hpp"
 #include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/classes/theme.hpp"
@@ -12,6 +13,27 @@
 
 using namespace godot;
 AUTO_REGISTER_CLASS(GridInventory)
+
+void GridInventory::set_count_label_settings(const Ref<LabelSettings> &p_count_label_settings) {
+	const auto callable = callable_mp(this, &GridInventory::_on_label_settings_style_changed);
+
+	if (count_label_settings.is_valid() && count_label_settings->is_connected("changed", callable)) {
+		count_label_settings->disconnect("changed", callable);
+	}
+
+	if (p_count_label_settings.is_valid()) {
+		p_count_label_settings->connect("changed", callable);
+	}
+
+	for (KeyValue<int64_t, Slot> &kv : cells) {
+		const Slot &slot = kv.value;
+		if (slot.count_label) {
+			slot.count_label->set_label_settings(p_count_label_settings);
+		}
+	}
+
+	this->count_label_settings = p_count_label_settings;
+}
 
 inline Ref<StyleBox> GridInventory::get_background() const {
 	return background;
@@ -70,7 +92,16 @@ Size2 GridInventory::_get_minimum_size() const {
 }
 
 void GridInventory::_on_style_changed() {
-	queue_redraw(); // Refresh when styles update
+	queue_redraw();
+}
+void GridInventory::_on_label_settings_style_changed() {
+	for (KeyValue<int64_t, Slot> &kv : cells) {
+		const Slot &slot = kv.value;
+		if (slot.count_label && count_label_settings.is_valid()) {
+			slot.count_label->set_label_settings(count_label_settings);
+		}
+	}
+	queue_redraw();
 }
 
 void GridInventory::_connect_signals(const Ref<StyleBox> &p_style) {
@@ -138,6 +169,7 @@ void GridInventory::_generate_grid_rects() {
 				slot.item_frame->disconnect("mouse_exited", slot_mouse_exited);
 				slot.item_frame->queue_free();
 				slot.item_frame = nullptr;
+				slot.count_label = nullptr;
 			}
 		}
 		cells.clear();
@@ -183,6 +215,20 @@ void GridInventory::_generate_grid_rects() {
 				add_child(slot.item_frame);
 			}
 
+			slot.count_label = memnew(Label);
+
+			slot.count_label->set_anchors_preset(LayoutPreset::PRESET_FULL_RECT);
+			slot.count_label->set_horizontal_alignment(HORIZONTAL_ALIGNMENT_RIGHT);
+			slot.count_label->set_vertical_alignment(VERTICAL_ALIGNMENT_BOTTOM);
+			slot.count_label->set_offset(Side::SIDE_RIGHT, -slot_size.x * 0.03);
+			slot.count_label->set_offset(Side::SIDE_BOTTOM, -slot_size.y * 0.04);
+			slot.count_label->set_z_index(get_z_index() + 1);
+
+			if (count_label_settings.is_valid()) {
+				slot.count_label->set_label_settings(count_label_settings);
+			}
+			slot.count_label->queue_redraw(); //apply settings
+			slot.item_frame->add_child(slot.count_label);
 			cells.insert(key, slot);
 		}
 	}
@@ -194,11 +240,15 @@ void GridInventory::_generate_grid_rects() {
 	queue_redraw();
 }
 
-void GridInventory::_update_item_icon(Slot &slot) {
+void GridInventory::_sync_item_view(Slot &slot) {
 	if (slot.item.is_null()) {
 		return;
 	}
-
+	if (!slot.icon) {
+		slot.icon = memnew(TextureRect); // use TextureRect for don't redraw all grid
+		slot.icon->set_mouse_filter(MOUSE_FILTER_IGNORE);
+		add_child(slot.icon);
+	}
 	if (slot.item->get_icon().is_null()) {
 		if (slot.icon) {
 			slot.icon->set_texture(Ref<Texture>());
@@ -208,18 +258,17 @@ void GridInventory::_update_item_icon(Slot &slot) {
 		return;
 	}
 
-	if (!slot.icon) {
-		slot.icon = memnew(TextureRect); // use TextureRect for don't redraw all grid
-		slot.icon->set_mouse_filter(MOUSE_FILTER_IGNORE);
-		add_child(slot.icon);
-	}
-
 	slot.icon->set_texture(slot.item->get_icon());
 	slot.icon->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
 	slot.icon->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
 	slot.icon->set_size(slot.rect.size);
 	slot.icon->set_pivot_offset(slot_size * 0.5);
 	slot.icon->set_position(slot.rect.get_position());
+
+	const String text = vformat("%s", slot.item->get_item_amount());
+	if (slot.count_label) {
+		slot.count_label->set_text(text);
+	}
 }
 
 void GridInventory::_on_slot_mouse_entered() {
@@ -231,7 +280,6 @@ void GridInventory::_on_slot_mouse_entered() {
 			slot->item_frame->queue_redraw();
 		}
 	}
-
 }
 void GridInventory::_on_slot_mouse_exited() {
 	if (hovered_slot_key != INVALID_KEY) {
@@ -253,7 +301,9 @@ void GridInventory::_clear_slot(Slot &slot) {
 		slot.icon->queue_free();
 		slot.icon = nullptr;
 	}
-
+	if (slot.count_label) {
+		slot.count_label->set_text("");
+	}
 }
 
 void GridInventory::_notification(int p_what) {
@@ -308,7 +358,8 @@ bool GridInventory::add_item_at(const Ref<ItemView> &p_item, const Point2i p_poi
 	if (Slot *slot = cells.getptr(key)) {
 		if (slot->item.is_null()) {
 			slot->item = p_item;
-			_update_item_icon(*slot);
+			_sync_item_view(*slot);
+
 			return true;
 		}
 
@@ -316,6 +367,7 @@ bool GridInventory::add_item_at(const Ref<ItemView> &p_item, const Point2i p_poi
 			const int current_amount = slot->item->get_item_amount();
 			const int incoming_amount = p_item->get_item_amount();
 			slot->item->set_item_amount(current_amount + incoming_amount);
+			_sync_item_view(*slot);
 			return true;
 		}
 	}
@@ -340,7 +392,7 @@ bool GridInventory::add_item(Ref<ItemView> p_item) {
 		if (Slot *slot = cells.getptr(key)) {
 			slot->item = p_item;
 			UtilityFunctions::print(p_item->get_name());
-			_update_item_icon(*slot);
+			_sync_item_view(*slot);
 			return true;
 		}
 	}
@@ -373,6 +425,9 @@ void GridInventory::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_grid_padding"), &GridInventory::get_grid_padding);
 	ClassDB::bind_method(D_METHOD("set_grid_padding", "grid_padding"), &GridInventory::set_grid_padding);
 
+	ClassDB::bind_method(D_METHOD("get_count_label_settings"), &GridInventory::get_count_label_settings);
+	ClassDB::bind_method(D_METHOD("set_count_label_settings", "count_label_settings"), &GridInventory::set_count_label_settings);
+
 	ClassDB::bind_method(D_METHOD("add_item", "item"), &GridInventory::add_item);
 	ClassDB::bind_method(D_METHOD("add_item_at", "item", "point"), &GridInventory::add_item_at);
 
@@ -380,6 +435,7 @@ void GridInventory::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "background", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Background"), "set_background", "get_background");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame"), "set_item_frame", "get_item_frame");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "item_frame_hover", PROPERTY_HINT_RESOURCE_TYPE, "StyleBox", PROPERTY_USAGE_DEFAULT, "Item Frame Hover"), "set_item_frame_hover", "get_item_frame_hover");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "count_label_settings", PROPERTY_HINT_RESOURCE_TYPE, "LabelSettings", PROPERTY_USAGE_DEFAULT, "Label Settings"), "set_count_label_settings", "get_count_label_settings");
 
 	ADD_SUBGROUP("Layout", "");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "rows", PROPERTY_HINT_RANGE, "1,100,1"), "set_rows", "get_rows");
