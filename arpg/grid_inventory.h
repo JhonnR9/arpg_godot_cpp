@@ -16,8 +16,6 @@ namespace godot {
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
 
-	friend class SlotPanel;
-
 	Ref<StyleBox> background;
 	Ref<StyleBox> item_frame;
 	Ref<StyleBox> item_frame_hover;
@@ -27,10 +25,11 @@ class GridInventory final : public Control {
 
 private:
 	struct Slot {
+		int64_t key_in_grid = INVALID_KEY;
 		Rect2i rect;
 		Ref<ItemView> item;
 		TextureRect *icon = nullptr;
-		SlotPanel *item_frame = nullptr;
+		Panel *item_panel = nullptr;
 		Label *count_label = nullptr;
 	};
 
@@ -65,6 +64,10 @@ private:
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
+
+	Variant _get_drag_data_call(const Vector2 &p_at_position);
+	bool _can_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) const;
+	void _drop_data_call(const Vector2 &p_at_position, const Variant &p_data);
 
 public:
 	bool add_item_at(const Ref<ItemView> &p_item, Point2i p_point);

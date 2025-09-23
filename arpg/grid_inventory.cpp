@@ -8,7 +8,6 @@
 #include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/classes/theme.hpp"
 #include "godot_cpp/templates/pair.hpp"
-#include "slot_panel.h"
 #include "tools/auto_resgister.h"
 
 using namespace godot;
@@ -161,14 +160,14 @@ void GridInventory::_generate_grid_rects() {
 	if (cells.size() > 0) {
 		for (KeyValue<int64_t, Slot> &kv : cells) {
 			Slot &slot = kv.value;
-			if (slot.item_frame) {
+			if (slot.item_panel) {
 				Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
 				Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
 
-				slot.item_frame->disconnect("mouse_entered", slot_mouse_entered);
-				slot.item_frame->disconnect("mouse_exited", slot_mouse_exited);
-				slot.item_frame->queue_free();
-				slot.item_frame = nullptr;
+				slot.item_panel->disconnect("mouse_entered", slot_mouse_entered);
+				slot.item_panel->disconnect("mouse_exited", slot_mouse_exited);
+				slot.item_panel->queue_free();
+				slot.item_panel = nullptr;
 				slot.count_label = nullptr;
 			}
 		}
@@ -194,25 +193,31 @@ void GridInventory::_generate_grid_rects() {
 			const int64_t key = _make_cell_key(col, row);
 
 			Slot slot;
-			slot.item_frame = memnew(SlotPanel);
+			slot.item_panel = memnew(Panel);
 			slot.rect = rect;
-			slot.item_frame->set_key_in_grid(key);
+			slot.key_in_grid = key;
 
 			Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
 			Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
 
-			slot.item_frame->connect("mouse_entered", slot_mouse_entered);
-			slot.item_frame->connect("mouse_exited", slot_mouse_exited);
+			slot.item_panel->connect("mouse_entered", slot_mouse_entered);
+			slot.item_panel->connect("mouse_exited", slot_mouse_exited);
 
-			if (slot.item_frame) {
-				slot.item_frame->set_size(slot_size);
-				slot.item_frame->set_position(pos);
+			if (slot.item_panel) {
+				slot.item_panel->set_size(slot_size);
+				slot.item_panel->set_position(pos);
 
 				if (item_frame.is_valid()) {
-					slot.item_frame->add_theme_stylebox_override("panel", item_frame);
+					slot.item_panel->add_theme_stylebox_override("panel", item_frame);
 				}
 
-				add_child(slot.item_frame);
+				Callable drag_func = callable_mp(this, &GridInventory::_get_drag_data_call);
+				Callable can_drop_func = callable_mp(this, &GridInventory::_can_drop_data_call);
+				Callable drop_func = callable_mp(this, &GridInventory::_drop_data_call);
+
+				slot.item_panel->set_drag_forwarding(drag_func, can_drop_func, drop_func);
+				add_child(slot.item_panel);
+
 			}
 
 			slot.count_label = memnew(Label);
@@ -228,7 +233,7 @@ void GridInventory::_generate_grid_rects() {
 				slot.count_label->set_label_settings(count_label_settings);
 			}
 			slot.count_label->queue_redraw(); //apply settings
-			slot.item_frame->add_child(slot.count_label);
+			slot.item_panel->add_child(slot.count_label);
 			cells.insert(key, slot);
 		}
 	}
@@ -275,18 +280,18 @@ void GridInventory::_on_slot_mouse_entered() {
 	const int64_t key = _get_key_from_position(get_local_mouse_position());
 	if (const Slot *slot = cells.getptr(key)) {
 		hovered_slot_key = key;
-		if (item_frame_hover.is_valid() && slot->item_frame) {
-			slot->item_frame->add_theme_stylebox_override("panel", item_frame_hover);
-			slot->item_frame->queue_redraw();
+		if (item_frame_hover.is_valid() && slot->item_panel) {
+			slot->item_panel->add_theme_stylebox_override("panel", item_frame_hover);
+			slot->item_panel->queue_redraw();
 		}
 	}
 }
 void GridInventory::_on_slot_mouse_exited() {
 	if (hovered_slot_key != INVALID_KEY) {
 		if (const Slot *slot = cells.getptr(hovered_slot_key)) {
-			if (item_frame.is_valid() && slot->item_frame) {
-				slot->item_frame->add_theme_stylebox_override("panel", item_frame);
-				slot->item_frame->queue_redraw();
+			if (item_frame.is_valid() && slot->item_panel) {
+				slot->item_panel->add_theme_stylebox_override("panel", item_frame);
+				slot->item_panel->queue_redraw();
 			}
 		}
 	}
@@ -341,6 +346,54 @@ void GridInventory::_notification(int p_what) {
 			break;
 	}
 }
+Variant GridInventory::_get_drag_data_call(const Vector2 &p_at_position) {
+	if (auto *slot = cells.getptr(hovered_slot_key)) {
+		if (slot->item.is_valid()) {
+			if (Control *control = cast_to<Control>(slot->icon->duplicate()); slot->icon && control) {
+				set_drag_preview(control);
+			}
+
+			Ref<ItemView> item = slot->item;
+			_clear_slot(*slot);
+
+			return item;
+		}
+	}
+	return Variant();
+}
+bool GridInventory::_can_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) const {
+	if (const auto *slot = cells.getptr(hovered_slot_key)) {
+		if (slot->item.is_null()) {
+			return true;
+		}
+
+		const Ref<ItemView> item = p_data;
+		if (item.is_null()) {
+			return false;
+		}
+
+		if (slot->item->get_id() == item->get_id()) {
+			return true;
+		}
+	}
+	return false;
+}
+void GridInventory::_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) {
+	if (const auto *slot = cells.getptr(hovered_slot_key)) {
+		const Ref<ItemView> item = p_data;
+		if (item.is_valid()) {
+			const Point2i hovered_pos{
+				_get_col_from_key(hovered_slot_key),
+				_get_row_from_key(hovered_slot_key)
+			};
+
+			if (!add_item_at(item, hovered_pos)) {
+				UtilityFunctions::print("Could not add item to destination slot.");
+			}
+		}
+	}
+}
+
 bool GridInventory::add_item_at(const Ref<ItemView> &p_item, const Point2i p_point) {
 	if (p_item.is_null()) {
 		ERR_PRINT("Cannot add null item to inventory.");
