@@ -25,7 +25,6 @@ class GridInventory final : public Control {
 
 private:
 	struct Slot {
-		int64_t key_in_grid = INVALID_KEY;
 		Rect2i rect;
 		Ref<ItemView> item;
 		TextureRect *icon = nullptr;

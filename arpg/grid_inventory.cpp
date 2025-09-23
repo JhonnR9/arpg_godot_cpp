@@ -195,7 +195,6 @@ void GridInventory::_generate_grid_rects() {
 			Slot slot;
 			slot.item_panel = memnew(Panel);
 			slot.rect = rect;
-			slot.key_in_grid = key;
 
 			Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
 			Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
@@ -217,7 +216,6 @@ void GridInventory::_generate_grid_rects() {
 
 				slot.item_panel->set_drag_forwarding(drag_func, can_drop_func, drop_func);
 				add_child(slot.item_panel);
-
 			}
 
 			slot.count_label = memnew(Label);
@@ -227,7 +225,7 @@ void GridInventory::_generate_grid_rects() {
 			slot.count_label->set_vertical_alignment(VERTICAL_ALIGNMENT_BOTTOM);
 			slot.count_label->set_offset(Side::SIDE_RIGHT, -slot_size.x * 0.03);
 			slot.count_label->set_offset(Side::SIDE_BOTTOM, -slot_size.y * 0.04);
-			slot.count_label->set_z_index(get_z_index() + 1);
+			slot.count_label->set_z_index(get_z_index() + 2);
 
 			if (count_label_settings.is_valid()) {
 				slot.count_label->set_label_settings(count_label_settings);
@@ -249,10 +247,10 @@ void GridInventory::_sync_item_view(Slot &slot) {
 	if (slot.item.is_null()) {
 		return;
 	}
-	if (!slot.icon) {
+
+	if (!slot.icon && slot.item_panel) {
 		slot.icon = memnew(TextureRect); // use TextureRect for don't redraw all grid
 		slot.icon->set_mouse_filter(MOUSE_FILTER_IGNORE);
-		add_child(slot.icon);
 	}
 	if (slot.item->get_icon().is_null()) {
 		if (slot.icon) {
@@ -263,12 +261,19 @@ void GridInventory::_sync_item_view(Slot &slot) {
 		return;
 	}
 
-	slot.icon->set_texture(slot.item->get_icon());
-	slot.icon->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
-	slot.icon->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
-	slot.icon->set_size(slot.rect.size);
-	slot.icon->set_pivot_offset(slot_size * 0.5);
-	slot.icon->set_position(slot.rect.get_position());
+	if (slot.item_panel) {
+		slot.icon->set_texture(slot.item->get_icon());
+		slot.icon->set_z_index(slot.item_panel->get_z_index() + 1);
+		slot.icon->set_expand_mode(TextureRect::EXPAND_IGNORE_SIZE);
+		slot.icon->set_stretch_mode(TextureRect::STRETCH_KEEP_ASPECT_CENTERED);
+		slot.icon->set_size(slot.rect.size);
+		slot.icon->set_pivot_offset(slot_size * 0.5);
+
+		if (!slot.icon->is_inside_tree()) {
+			slot.item_panel->add_child(slot.icon);
+		}
+
+	}
 
 	const String text = vformat("%s", slot.item->get_item_amount());
 	if (slot.count_label) {
@@ -379,7 +384,7 @@ bool GridInventory::_can_drop_data_call(const Vector2 &p_at_position, const Vari
 	return false;
 }
 void GridInventory::_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) {
-	if (const auto *slot = cells.getptr(hovered_slot_key)) {
+	if (cells.has(hovered_slot_key)) {
 		const Ref<ItemView> item = p_data;
 		if (item.is_valid()) {
 			const Point2i hovered_pos{
