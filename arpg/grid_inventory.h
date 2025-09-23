@@ -21,9 +21,6 @@ class GridInventory final : public Control {
 	Ref<StyleBox> item_frame_hover;
 	Ref<LabelSettings> count_label_settings;
 
-
-
-private:
 	struct Slot {
 		Rect2i rect;
 		Ref<ItemView> item;
@@ -45,6 +42,9 @@ private:
 	void _draw_background();
 	int64_t _get_key_from_position(Point2i pos) const;
 	void _generate_grid_rects();
+	void _clear_grid_rects();
+	[[nodiscard]] Panel* _create_item_panel(const Point2i &pos);
+	[[nodiscard]] Label* _create_count_label();
 	void _sync_item_view(Slot &slot);
 	void _on_slot_mouse_entered();
 	void _on_slot_mouse_exited();

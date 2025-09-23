@@ -813,7 +813,9 @@ drag_vertical_enabled = true
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Iventory" parent="CanvasLayer" instance=ExtResource("20_k6u5g")]
-anchors_preset = 15
+offset_top = 0.0
+offset_right = 0.0
+grow_vertical = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 

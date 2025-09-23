@@ -158,21 +158,9 @@ int64_t GridInventory::_get_key_from_position(const Point2i pos) const {
 
 void GridInventory::_generate_grid_rects() {
 	if (cells.size() > 0) {
-		for (KeyValue<int64_t, Slot> &kv : cells) {
-			Slot &slot = kv.value;
-			if (slot.item_panel) {
-				Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
-				Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
-
-				slot.item_panel->disconnect("mouse_entered", slot_mouse_entered);
-				slot.item_panel->disconnect("mouse_exited", slot_mouse_exited);
-				slot.item_panel->queue_free();
-				slot.item_panel = nullptr;
-				slot.count_label = nullptr;
-			}
-		}
-		cells.clear();
+		_clear_grid_rects();
 	}
+
 
 	if (slot_size.x < 1 || slot_size.y < 1) {
 		queue_redraw();
@@ -195,43 +183,11 @@ void GridInventory::_generate_grid_rects() {
 			Slot slot;
 			slot.item_panel = memnew(Panel);
 			slot.rect = rect;
-
-			Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
-			Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
-
-			slot.item_panel->connect("mouse_entered", slot_mouse_entered);
-			slot.item_panel->connect("mouse_exited", slot_mouse_exited);
-
-			if (slot.item_panel) {
-				slot.item_panel->set_size(slot_size);
-				slot.item_panel->set_position(pos);
-
-				if (item_frame.is_valid()) {
-					slot.item_panel->add_theme_stylebox_override("panel", item_frame);
-				}
-
-				Callable drag_func = callable_mp(this, &GridInventory::_get_drag_data_call);
-				Callable can_drop_func = callable_mp(this, &GridInventory::_can_drop_data_call);
-				Callable drop_func = callable_mp(this, &GridInventory::_drop_data_call);
-
-				slot.item_panel->set_drag_forwarding(drag_func, can_drop_func, drop_func);
-				add_child(slot.item_panel);
-			}
-
-			slot.count_label = memnew(Label);
-
-			slot.count_label->set_anchors_preset(LayoutPreset::PRESET_FULL_RECT);
-			slot.count_label->set_horizontal_alignment(HORIZONTAL_ALIGNMENT_RIGHT);
-			slot.count_label->set_vertical_alignment(VERTICAL_ALIGNMENT_BOTTOM);
-			slot.count_label->set_offset(Side::SIDE_RIGHT, -slot_size.x * 0.03);
-			slot.count_label->set_offset(Side::SIDE_BOTTOM, -slot_size.y * 0.04);
-			slot.count_label->set_z_index(get_z_index() + 2);
-
-			if (count_label_settings.is_valid()) {
-				slot.count_label->set_label_settings(count_label_settings);
-			}
-			slot.count_label->queue_redraw(); //apply settings
+			slot.item_panel = _create_item_panel(pos);
+			slot.count_label = _create_count_label();
 			slot.item_panel->add_child(slot.count_label);
+			add_child(slot.item_panel);
+
 			cells.insert(key, slot);
 		}
 	}
@@ -242,6 +198,62 @@ void GridInventory::_generate_grid_rects() {
 	update_minimum_size();
 	queue_redraw();
 }
+void GridInventory::_clear_grid_rects() {
+		for (KeyValue<int64_t, Slot> &kv : cells) {
+			Slot &slot = kv.value;
+			if (slot.item_panel) {
+				Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
+				Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
+
+				slot.item_panel->disconnect("mouse_entered", slot_mouse_entered);
+				slot.item_panel->disconnect("mouse_exited", slot_mouse_exited);
+				slot.item_panel->queue_free();
+				slot.item_panel = nullptr;
+				slot.count_label = nullptr;
+			}
+		}
+		cells.clear();
+
+}
+
+Panel* GridInventory::_create_item_panel(const Point2i &pos) {
+	Panel *panel = memnew(Panel);
+	panel->set_size(slot_size);
+	panel->set_position(pos);
+
+	if (item_frame.is_valid()) {
+		panel->add_theme_stylebox_override("panel", item_frame);
+	}
+
+	panel->connect("mouse_entered", callable_mp(this, &GridInventory::_on_slot_mouse_entered));
+	panel->connect("mouse_exited", callable_mp(this, &GridInventory::_on_slot_mouse_exited));
+
+	panel->set_drag_forwarding(
+		callable_mp(this, &GridInventory::_get_drag_data_call),
+		callable_mp(this, &GridInventory::_can_drop_data_call),
+		callable_mp(this, &GridInventory::_drop_data_call)
+	);
+
+	return panel;
+}
+
+Label* GridInventory::_create_count_label() {
+	Label *label = memnew(Label);
+	label->set_anchors_preset(LayoutPreset::PRESET_FULL_RECT);
+	label->set_horizontal_alignment(HORIZONTAL_ALIGNMENT_RIGHT);
+	label->set_vertical_alignment(VERTICAL_ALIGNMENT_BOTTOM);
+	label->set_offset(Side::SIDE_RIGHT, -slot_size.x * 0.03);
+	label->set_offset(Side::SIDE_BOTTOM, -slot_size.y * 0.04);
+	label->set_z_index(get_z_index() + 2);
+
+	if (count_label_settings.is_valid()) {
+		label->set_label_settings(count_label_settings);
+	}
+	label->queue_redraw();
+
+	return label;
+}
+
 
 void GridInventory::_sync_item_view(Slot &slot) {
 	if (slot.item.is_null()) {
@@ -257,7 +269,7 @@ void GridInventory::_sync_item_view(Slot &slot) {
 			slot.icon->set_texture(Ref<Texture>());
 		}
 
-		UtilityFunctions::print("the item", slot.item->get_name(), "dont have icon!");
+		UtilityFunctions::push_warning("the item", slot.item->get_name(), "dont have icon!");
 		return;
 	}
 
