@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://g5r1otrefvmf"]
+[gd_scene load_steps=9 format=3 uid="uid://g5r1otrefvmf"]
 
-[ext_resource type="Script" uid="uid://2tfsjdgogev" path="res://grid_inventory.gd" id="1_0anj3"]
+[ext_resource type="Script" uid="uid://2tfsjdgogev" path="res://scripts/grid_inventory.gd" id="1_0anj3"]
 [ext_resource type="FontFile" uid="uid://bdinlrfd0jr0n" path="res://resources/small_pixel.ttf" id="1_vdk5y"]
 [ext_resource type="Texture2D" uid="uid://cyp1n8fi003in" path="res://Sprites/icon1.png" id="2_f542o"]
+[ext_resource type="Texture2D" uid="uid://dbcqphf825f7y" path="res://Sprites/icon19.png" id="4_kh0vi"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
 bg_color = Color(0.58, 0.348, 0.348, 1)
@@ -60,15 +61,11 @@ size_flags_horizontal = 3
 
 [node name="BoxContainer" type="BoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -92.0
-offset_top = -59.0
-offset_right = 92.0
-offset_bottom = 59.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_right = -32.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
@@ -78,13 +75,13 @@ background = SubResource("StyleBoxFlat_ei5da")
 item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
 count_label_settings = SubResource("LabelSettings_kh0vi")
-rows = 3
-columns = 6
+columns = 3
 slot_size = Vector2i(32, 32)
 slot_margin = Vector2i(3, 3)
 grid_padding = Vector2i(6, 8)
 layout_mode = 2
-size_flags_horizontal = 6
+size_flags_horizontal = 2
 size_flags_vertical = 4
 script = ExtResource("1_0anj3")
 texture = ExtResource("2_f542o")
+texture2 = ExtResource("4_kh0vi")

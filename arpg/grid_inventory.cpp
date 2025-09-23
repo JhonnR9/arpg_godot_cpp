@@ -161,27 +161,23 @@ void GridInventory::_generate_grid_rects() {
 		_clear_grid_rects();
 	}
 
-	if (slot_size.x < 1 || slot_size.y < 1) {
-		queue_redraw();
-		return;
-	}
-	if (rows < 1 || columns < 1) {
+	// Invalid size
+	if (slot_size.x < 1 || slot_size.y < 1 || rows < 1 || columns < 1) {
 		queue_redraw();
 		return;
 	}
 
+	cells.reserve(rows * columns + 1);
 	for (int row = 0; row < rows; row++) {
 		for (int col = 0; col < columns; col++) {
 			const int x = grid_padding.x + col * (slot_size.x + slot_margin.x);
 			const int y = grid_padding.y + row * (slot_size.y + slot_margin.y);
 
 			const Point2i pos(x, y);
-			const Rect2i rect(pos, slot_size);
 			const int64_t key = _make_cell_key(col, row);
 
 			Slot slot;
-			slot.item_panel = memnew(Panel);
-			slot.rect = rect;
+			slot.rect = Rect2i(pos, slot_size);
 			slot.item_panel = _create_item_panel(pos);
 			slot.count_label = _create_count_label();
 			slot.item_panel->add_child(slot.count_label);
@@ -191,8 +187,7 @@ void GridInventory::_generate_grid_rects() {
 		}
 	}
 
-	// Reset hover and selection state
-	hovered_slot_key = INVALID_KEY;
+	hovered_slot_key = INVALID_KEY; // Reset hover and selection state
 
 	update_minimum_size();
 	queue_redraw();
@@ -211,6 +206,7 @@ void GridInventory::_clear_grid_rects() {
 			slot.count_label = nullptr;
 		}
 	}
+
 	cells.clear();
 }
 
@@ -310,7 +306,7 @@ void GridInventory::_on_slot_mouse_exited() {
 	hovered_slot_key = INVALID_KEY;
 }
 void GridInventory::_clear_slot(Slot &slot) {
-	if (!slot.item.is_null()) {
+	if (slot.item.is_valid()) {
 		slot.item.unref();
 	}
 
@@ -355,6 +351,7 @@ void GridInventory::_notification(int p_what) {
 			break;
 		case NOTIFICATION_DRAG_END: {
 			if (start_drag_slot && !is_drag_successful()) {
+				// restore backup
 				start_drag_slot->item = item_view_backup;
 				_sync_item_view(*start_drag_slot);
 				start_drag_slot = nullptr;
@@ -368,13 +365,19 @@ void GridInventory::_notification(int p_what) {
 }
 Variant GridInventory::_get_drag_data_call(const Vector2 &p_at_position) {
 	if (auto *slot = cells.getptr(hovered_slot_key)) {
-		if (slot->item.is_valid( ) && slot->icon) {
+		if (slot->item.is_valid() && slot->icon) {
 			if (Control *image = cast_to<Control>(slot->icon->duplicate()); image) {
-				Control * preview_container = memnew(Control); // hack to allow center preview
+				Control *preview_container = memnew(Control); // hack to allow center preview
 				preview_container->add_child(image);
+
+				if (slot->count_label) {
+					const auto label = slot->count_label->duplicate();
+					image->add_child(label);
+				}
+
 				// Center preview
-				image->set_offset(Side::SIDE_TOP, -slot->rect.size.x/2);
-				image->set_offset(Side::SIDE_LEFT, -slot->rect.size.y/2);
+				image->set_offset(Side::SIDE_TOP, -slot->rect.size.x / 2);
+				image->set_offset(Side::SIDE_LEFT, -slot->rect.size.y / 2);
 				image->set_size(slot->rect.size);
 
 				set_drag_preview(preview_container);
@@ -401,14 +404,16 @@ Variant GridInventory::_get_drag_data_call(const Vector2 &p_at_position) {
 bool GridInventory::_can_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) const {
 	const int64_t key = _get_key_from_position(p_at_position);
 	if (const Ref<ItemView> item = p_data; item.is_valid()) {
-		if (const auto *slot = cells.getptr(key)) {
-			if (slot->item.is_null() || slot->item->get_id() == item->get_id()) {
-				return true;
+		if (cells.has(key)) {
+			if (const Ref<ItemView> slot_item = cells.getptr(key)->item; slot_item.is_valid()) {
+				if (slot_item->get_id()==item->get_id()) {
+					return true;
+				}
+				return false;
 			}
-
+			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -417,10 +422,9 @@ void GridInventory::_drop_data_call(const Vector2 &p_at_position, const Variant 
 	if (item.is_valid()) {
 		const auto key = _get_key_from_position(get_local_mouse_position());
 		if (cells.has(key)) {
-			const Point2i hovered_pos{_get_col_from_key(key),_get_row_from_key(key)};
+			const Point2i hovered_pos{ _get_col_from_key(key), _get_row_from_key(key) };
 
 			add_item_at(item, hovered_pos);
-
 		}
 	}
 }
@@ -446,11 +450,8 @@ bool GridInventory::add_item_at(const Ref<ItemView> &p_item, const Point2i p_poi
 
 			return true;
 		}
-
 		if (slot->item->get_id() == p_item->get_id()) {
-			const int current_amount = slot->item->get_item_amount();
-			const int incoming_amount = p_item->get_item_amount();
-			slot->item->set_item_amount(current_amount + incoming_amount);
+			slot->item->set_item_amount(slot->item->get_item_amount() + p_item->get_item_amount());
 			_sync_item_view(*slot);
 			return true;
 		}
@@ -464,22 +465,34 @@ bool GridInventory::add_item(Ref<ItemView> p_item) {
 		return false;
 	}
 
-	int64_t key = INVALID_KEY;
+	int64_t first_empty_slot_key = INVALID_KEY;
+	int64_t stackable_slot_key = INVALID_KEY;
+
 	for (const KeyValue<int64_t, Slot> &kv : cells) {
-		if (kv.value.item.is_null()) {
-			key = kv.key;
-			break;
+		if (kv.value.item.is_valid()) {
+			if (kv.value.item->get_id() == p_item->get_id()) {
+				stackable_slot_key = kv.key;
+				break;
+			}
+		} else if (first_empty_slot_key == INVALID_KEY) {
+			first_empty_slot_key = kv.key;
 		}
 	}
 
-	if (key != INVALID_KEY) {
-		if (Slot *slot = cells.getptr(key)) {
-			slot->item = p_item;
+	const int64_t final_key = stackable_slot_key != INVALID_KEY ? stackable_slot_key : first_empty_slot_key;
+
+	if (final_key != INVALID_KEY) {
+		if (Slot *slot = cells.getptr(final_key)) {
+			if (slot->item.is_valid()) {
+				slot->item->set_item_amount(p_item->get_item_amount() + slot->item->get_item_amount());
+			} else {
+				slot->item = p_item;
+			}
+
 			_sync_item_view(*slot);
 			return true;
 		}
 	}
-
 	return false;
 }
 
