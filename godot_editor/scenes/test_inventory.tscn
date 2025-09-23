@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cyp1n8fi003in" path="res://Sprites/icon1.png" id="2_f542o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
-bg_color = Color(0.2784, 0.29856, 0.48, 1)
+bg_color = Color(0.58, 0.348, 0.348, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -79,7 +79,7 @@ item_frame = SubResource("StyleBoxFlat_0anj3")
 item_frame_hover = SubResource("StyleBoxFlat_f542o")
 count_label_settings = SubResource("LabelSettings_kh0vi")
 rows = 3
-columns = 5
+columns = 6
 slot_size = Vector2i(32, 32)
 slot_margin = Vector2i(3, 3)
 grid_padding = Vector2i(6, 8)

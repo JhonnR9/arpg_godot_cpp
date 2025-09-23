@@ -161,7 +161,6 @@ void GridInventory::_generate_grid_rects() {
 		_clear_grid_rects();
 	}
 
-
 	if (slot_size.x < 1 || slot_size.y < 1) {
 		queue_redraw();
 		return;
@@ -199,24 +198,23 @@ void GridInventory::_generate_grid_rects() {
 	queue_redraw();
 }
 void GridInventory::_clear_grid_rects() {
-		for (KeyValue<int64_t, Slot> &kv : cells) {
-			Slot &slot = kv.value;
-			if (slot.item_panel) {
-				Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
-				Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
+	for (KeyValue<int64_t, Slot> &kv : cells) {
+		Slot &slot = kv.value;
+		if (slot.item_panel) {
+			Callable slot_mouse_entered = callable_mp(this, &GridInventory::_on_slot_mouse_entered);
+			Callable slot_mouse_exited = callable_mp(this, &GridInventory::_on_slot_mouse_exited);
 
-				slot.item_panel->disconnect("mouse_entered", slot_mouse_entered);
-				slot.item_panel->disconnect("mouse_exited", slot_mouse_exited);
-				slot.item_panel->queue_free();
-				slot.item_panel = nullptr;
-				slot.count_label = nullptr;
-			}
+			slot.item_panel->disconnect("mouse_entered", slot_mouse_entered);
+			slot.item_panel->disconnect("mouse_exited", slot_mouse_exited);
+			slot.item_panel->queue_free();
+			slot.item_panel = nullptr;
+			slot.count_label = nullptr;
 		}
-		cells.clear();
-
+	}
+	cells.clear();
 }
 
-Panel* GridInventory::_create_item_panel(const Point2i &pos) {
+Panel *GridInventory::_create_item_panel(const Point2i &pos) {
 	Panel *panel = memnew(Panel);
 	panel->set_size(slot_size);
 	panel->set_position(pos);
@@ -229,15 +227,14 @@ Panel* GridInventory::_create_item_panel(const Point2i &pos) {
 	panel->connect("mouse_exited", callable_mp(this, &GridInventory::_on_slot_mouse_exited));
 
 	panel->set_drag_forwarding(
-		callable_mp(this, &GridInventory::_get_drag_data_call),
-		callable_mp(this, &GridInventory::_can_drop_data_call),
-		callable_mp(this, &GridInventory::_drop_data_call)
-	);
+			callable_mp(this, &GridInventory::_get_drag_data_call),
+			callable_mp(this, &GridInventory::_can_drop_data_call),
+			callable_mp(this, &GridInventory::_drop_data_call));
 
 	return panel;
 }
 
-Label* GridInventory::_create_count_label() {
+Label *GridInventory::_create_count_label() {
 	Label *label = memnew(Label);
 	label->set_anchors_preset(LayoutPreset::PRESET_FULL_RECT);
 	label->set_horizontal_alignment(HORIZONTAL_ALIGNMENT_RIGHT);
@@ -253,7 +250,6 @@ Label* GridInventory::_create_count_label() {
 
 	return label;
 }
-
 
 void GridInventory::_sync_item_view(Slot &slot) {
 	if (slot.item.is_null()) {
@@ -284,7 +280,6 @@ void GridInventory::_sync_item_view(Slot &slot) {
 		if (!slot.icon->is_inside_tree()) {
 			slot.item_panel->add_child(slot.icon);
 		}
-
 	}
 
 	const String text = vformat("%s", slot.item->get_item_amount());
@@ -358,6 +353,14 @@ void GridInventory::_notification(int p_what) {
 			_disconnect_signals(item_frame);
 			_disconnect_signals(item_frame_hover);
 			break;
+		case NOTIFICATION_DRAG_END: {
+			if (start_drag_slot && !is_drag_successful()) {
+				start_drag_slot->item = item_view_backup;
+				_sync_item_view(*start_drag_slot);
+				start_drag_slot = nullptr;
+			}
+			break;
+		}
 
 		default:
 			break;
@@ -365,48 +368,59 @@ void GridInventory::_notification(int p_what) {
 }
 Variant GridInventory::_get_drag_data_call(const Vector2 &p_at_position) {
 	if (auto *slot = cells.getptr(hovered_slot_key)) {
-		if (slot->item.is_valid()) {
-			if (Control *control = cast_to<Control>(slot->icon->duplicate()); slot->icon && control) {
-				set_drag_preview(control);
+		if (slot->item.is_valid( ) && slot->icon) {
+			if (Control *image = cast_to<Control>(slot->icon->duplicate()); image) {
+				Control * preview_container = memnew(Control); // hack to allow center preview
+				preview_container->add_child(image);
+				// Center preview
+				image->set_offset(Side::SIDE_TOP, -slot->rect.size.x/2);
+				image->set_offset(Side::SIDE_LEFT, -slot->rect.size.y/2);
+				image->set_size(slot->rect.size);
+
+				set_drag_preview(preview_container);
 			}
 
 			Ref<ItemView> item = slot->item;
+			// Used for recover item if fail drag in NOTIFICATION_DRAG_END
+			item_view_backup = item;
+			start_drag_slot = slot;
+
+			// About duplication items
 			_clear_slot(*slot);
 
 			return item;
 		}
 	}
-	return Variant();
+	// reset status invalid position (start_drag_slot is not owner of pointer its safe)
+	start_drag_slot = nullptr;
+	item_view_backup.unref();
+
+	return nullptr;
 }
+
 bool GridInventory::_can_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) const {
-	if (const auto *slot = cells.getptr(hovered_slot_key)) {
-		if (slot->item.is_null()) {
-			return true;
-		}
+	const int64_t key = _get_key_from_position(p_at_position);
+	if (const Ref<ItemView> item = p_data; item.is_valid()) {
+		if (const auto *slot = cells.getptr(key)) {
+			if (slot->item.is_null() || slot->item->get_id() == item->get_id()) {
+				return true;
+			}
 
-		const Ref<ItemView> item = p_data;
-		if (item.is_null()) {
-			return false;
-		}
-
-		if (slot->item->get_id() == item->get_id()) {
-			return true;
 		}
 	}
+
 	return false;
 }
-void GridInventory::_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) {
-	if (cells.has(hovered_slot_key)) {
-		const Ref<ItemView> item = p_data;
-		if (item.is_valid()) {
-			const Point2i hovered_pos{
-				_get_col_from_key(hovered_slot_key),
-				_get_row_from_key(hovered_slot_key)
-			};
 
-			if (!add_item_at(item, hovered_pos)) {
-				UtilityFunctions::print("Could not add item to destination slot.");
-			}
+void GridInventory::_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) {
+	const Ref<ItemView> item = p_data;
+	if (item.is_valid()) {
+		const auto key = _get_key_from_position(get_local_mouse_position());
+		if (cells.has(key)) {
+			const Point2i hovered_pos{_get_col_from_key(key),_get_row_from_key(key)};
+
+			add_item_at(item, hovered_pos);
+
 		}
 	}
 }
@@ -461,7 +475,6 @@ bool GridInventory::add_item(Ref<ItemView> p_item) {
 	if (key != INVALID_KEY) {
 		if (Slot *slot = cells.getptr(key)) {
 			slot->item = p_item;
-			UtilityFunctions::print(p_item->get_name());
 			_sync_item_view(*slot);
 			return true;
 		}

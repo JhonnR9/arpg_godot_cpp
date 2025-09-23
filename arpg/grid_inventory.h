@@ -30,6 +30,8 @@ class GridInventory final : public Control {
 	};
 
 	int64_t hovered_slot_key = INVALID_KEY;
+	Ref<ItemView> item_view_backup;
+	Slot* start_drag_slot;
 
 	int rows = 4;
 	int columns = 8;
