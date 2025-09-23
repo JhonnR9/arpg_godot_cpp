@@ -1,0 +1,19 @@
+extends GridInventory
+
+@export var texture : Texture2D
+@export var texture2: Texture2D
+
+func _ready() -> void:
+	for i in 10:
+		var item = ItemView.new()
+		item.name = "hh"
+		item.icon=texture
+		item.id= 25
+		add_item(item)
+	
+	for i in 5:
+		var item2 = ItemView.new()
+		item2.name = "ds"
+		item2.icon =texture2
+		item2.id = 40
+		add_item(item2)
