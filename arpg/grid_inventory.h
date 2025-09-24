@@ -1,21 +1,18 @@
 #pragma once
 #include "godot_cpp/classes/control.hpp"
-#include "godot_cpp/classes/label.hpp"
-#include "godot_cpp/classes/panel.hpp"
-#include "godot_cpp/classes/label_settings.hpp"
-#include "godot_cpp/classes/style_box.hpp"
-#include "godot_cpp/classes/texture_rect.hpp"
 #include "godot_cpp/templates/hash_map.hpp"
 #include "item_view.h"
 
 namespace godot {
-
-#define INVALID_KEY -1
-#define INVALID_ID -1
+class Panel;
+class Label;
+class TextureRect;
+class LabelSettings;
+class StyleBox;
 
 class GridInventory final : public Control {
 	GDCLASS(GridInventory, Control)
-
+	// styles
 	Ref<StyleBox> background;
 	Ref<StyleBox> item_frame;
 	Ref<StyleBox> item_frame_hover;
@@ -29,28 +26,32 @@ class GridInventory final : public Control {
 		Label *count_label = nullptr;
 	};
 
+	static constexpr int64_t INVALID_KEY = -1;
 	int64_t hovered_slot_key = INVALID_KEY;
 	Ref<ItemView> item_view_backup;
 	Slot* start_drag_slot;
 
 	int rows = 4;
 	int columns = 8;
-	Size2 slot_size = Vector2(16, 16);
+	Size2i slot_size = Size2i(16, 16);
 	HashMap<int64_t, Slot> cells;
-	Size2i slot_margin = Vector2(2, 2);
-	Size2i grid_padding = Vector2(4, 4);
-
+	Size2i slot_margin = Size2i(2, 2);
+	Size2i grid_padding = Size2i(4, 4);
 
 	void _draw_background();
-	int64_t _get_key_from_position(Point2i pos) const;
 	void _generate_grid_rects();
 	void _clear_grid_rects();
+
 	[[nodiscard]] Panel* _create_item_panel(const Point2i &pos);
 	[[nodiscard]] Label* _create_count_label();
-	void _sync_item_view(Slot &slot);
-	void _on_slot_mouse_entered();
-	void _on_slot_mouse_exited();
+
 	static void _clear_slot(Slot &slot);
+	void _sync_item_view(Slot &slot);
+
+	void _connect_style_signal(const Ref<StyleBox> &p_style);
+	void _disconnect_style_signal(const Ref<StyleBox> &p_style);
+
+	int64_t _get_key_from_position(Point2i pos) const;
 
 	static int64_t _make_cell_key(const int col, const int row) {
 		return (static_cast<int64_t>(col) << 32) | static_cast<uint32_t>(row);
@@ -62,18 +63,30 @@ class GridInventory final : public Control {
 		return static_cast<int>(key & 0xFFFFFFFF);
 	}
 
+	// callables
+	Variant _on_get_drag_data(const Vector2 &p_at_position);
+	bool _on_can_drop_data(const Vector2 &p_at_position, const Variant &p_data) const;
+	void _on_drop_data(const Vector2 &p_at_position, const Variant &p_data);
+
+	void _on_style_changed();
+	void _on_label_settings_style_changed();
+
+	void _on_slot_mouse_entered();
+	void _on_slot_mouse_exited();
+
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 
-	Variant _get_drag_data_call(const Vector2 &p_at_position);
-	bool _can_drop_data_call(const Vector2 &p_at_position, const Variant &p_data) const;
-	void _drop_data_call(const Vector2 &p_at_position, const Variant &p_data);
-
 public:
+	// Overrides
+	Size2 _get_minimum_size() const override;
+
+	// API
 	bool add_item_at(const Ref<ItemView> &p_item, Point2i p_point);
 	bool add_item(Ref<ItemView> p_item);
 
+	// Gets and Sets
 	Ref<LabelSettings> get_count_label_settings() const { return count_label_settings; }
 	void set_count_label_settings(const Ref<LabelSettings> &p_count_label_settings);
 
@@ -113,13 +126,8 @@ public:
 	Size2i get_grid_padding() const {
 		return grid_padding;
 	}
-
 	void set_grid_padding(const Size2i &p_grid_padding);
-	Size2 _get_minimum_size() const override;
-	void _on_style_changed();
-	void _on_label_settings_style_changed();
-	void _connect_signals(const Ref<StyleBox> &p_style);
-	void _disconnect_signals(const Ref<StyleBox> &p_style);
+
 };
 
 } //namespace godot
