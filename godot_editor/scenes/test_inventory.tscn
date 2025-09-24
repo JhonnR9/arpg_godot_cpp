@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dbcqphf825f7y" path="res://Sprites/icon19.png" id="4_kh0vi"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ei5da"]
-bg_color = Color(0.58, 0.348, 0.348, 1)
+bg_color = Color(0.215718, 0.22584, 0.38398, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -18,7 +18,7 @@ corner_radius_bottom_left = 3
 anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0anj3"]
-bg_color = Color(0.123473, 0.123473, 0.123473, 1)
+bg_color = Color(0.24, 0.262667, 0.32, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -77,8 +77,8 @@ item_frame_hover = SubResource("StyleBoxFlat_f542o")
 count_label_settings = SubResource("LabelSettings_kh0vi")
 columns = 3
 slot_size = Vector2i(32, 32)
-slot_margin = Vector2i(3, 3)
-grid_padding = Vector2i(6, 8)
+slot_margin = Vector2i(4, 4)
+grid_padding = Vector2i(8, 10)
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 4
